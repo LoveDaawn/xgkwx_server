@@ -1,4 +1,4 @@
-package com.yuxi.common.utils;
+package com.yuxi.xgkwx.common.utils;
 
 public class RuleUtil {
     public static boolean isWin(int[] cards) {
