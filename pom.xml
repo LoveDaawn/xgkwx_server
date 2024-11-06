@@ -13,7 +13,6 @@
         <module>xgkwx_domain</module>
         <module>xgkwx_adapter</module>
         <module>xgkwx_application</module>
-        <module>xgkwx_web</module>
         <module>xgkwx_socket</module>
         <module>xgkwx_boot</module>
     </modules>
