@@ -15,6 +15,7 @@
         <module>xgkwx_application</module>
         <module>xgkwx_web</module>
         <module>xgkwx_socket</module>
+        <module>xgkwx_boot</module>
     </modules>
 
     <properties>
@@ -25,10 +26,7 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-        </dependency>
+
     </dependencies>
 
     <dependencyManagement>
@@ -40,17 +38,22 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
-                <version>1.2.70</version>
+                <version>2.0.51</version>
             </dependency>
 
             <dependency>
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-all</artifactId>
-                <version>5.8.10</version>
+                <version>5.8.25</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.yuxi</groupId>
+                <artifactId>xgkwx_common</artifactId>
+                <version>1.0-SNAPSHOT</version>
             </dependency>
 
             <!-- 集成mybatis-->
@@ -59,11 +62,12 @@
                 <artifactId>mybatis-spring-boot-starter</artifactId>
                 <version>3.0.0</version>
             </dependency>
+
             <!-- 集成mysql连接 -->
             <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
-                <version>8.0.22</version>
+                <version>8.0.28</version>
             </dependency>
 
             <dependency>
@@ -71,15 +75,22 @@
                 <artifactId>pagehelper-spring-boot-starter</artifactId>
                 <version>1.4.6</version>
             </dependency>
+
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-all</artifactId>
-                <version>4.1.85.Final</version>
+                <version>4.1.108.Final</version>
             </dependency>
+
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
                 <version>2.0.13</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-autoconfigure</artifactId>
+                <version>3.0.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
