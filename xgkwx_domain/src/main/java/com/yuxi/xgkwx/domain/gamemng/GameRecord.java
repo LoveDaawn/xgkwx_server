@@ -6,7 +6,7 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class GameRecord {
-    private Long id;
+    private Long gameId;
     private String user1;
     private String user2;
     private String user3;

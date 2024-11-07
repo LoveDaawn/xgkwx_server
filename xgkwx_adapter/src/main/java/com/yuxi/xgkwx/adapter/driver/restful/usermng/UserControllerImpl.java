@@ -1,6 +1,5 @@
-package com.yuxi.xgkwx.adapter.driver.restful.usermng.impl;
+package com.yuxi.xgkwx.adapter.driver.restful.usermng;
 
-import com.yuxi.xgkwx.adapter.driver.restful.usermng.UserController;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController

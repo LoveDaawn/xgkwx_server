@@ -22,6 +22,11 @@
             <groupId>com.yuxi</groupId>
             <artifactId>xgkwx_common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.yuxi</groupId>
+            <artifactId>xgkwx_domain</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 </project>
