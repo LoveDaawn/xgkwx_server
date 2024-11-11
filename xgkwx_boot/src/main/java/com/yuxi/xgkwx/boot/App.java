@@ -11,9 +11,9 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.Environment;
 
-@SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
+@SpringBootApplication()
 @ComponentScan("com.yuxi")
-//@MapperScan("com.yuxi.xgkwx.*.mapper")
+@MapperScan("com.yuxi.xgkwx.*.*.mapper")
 public class App {
     private static final Logger log = LoggerFactory.getLogger(App.class);
 
@@ -21,6 +21,6 @@ public class App {
         SpringApplication app = new SpringApplication(App.class);
         Environment env = app.run(args).getEnvironment();
         log.info("启动成功！！");
-        log.info("测试地址: \thttp://127.0.0.1:{}{}/hello", env.getProperty("server.port"), env.getProperty("server.servlet.context-path"));
+//        log.info("测试地址: \thttp://127.0.0.1:{}{}", env.getProperty("server.port"), env.getProperty("server.servlet.context-path"));
     }
 }

@@ -13,7 +13,7 @@ public class WebsocketApplication {
     @Resource
     private WebSocketInitialization websocketInitialization;
 
-    @PostConstruct
+//    @PostConstruct
     public void start() {
         try {
             log.info(Thread.currentThread().getName() + ":websocket启动中......");

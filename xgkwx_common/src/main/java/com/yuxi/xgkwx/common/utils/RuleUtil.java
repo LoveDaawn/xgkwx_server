@@ -6,11 +6,11 @@ public class RuleUtil {
             return true;
         }
         boolean isWin = false;
-        for(int i = 0; i < 36; i++) {
-            if(cards[i] >= 2) {
-                cards[i] -= 2;
-                isWin = process(cards);
-                cards[i] += 2;
+        for(int i = 11; i < 36; i++) {
+            if(cards[i] >= 2) { //找将
+                cards[i] -= 2;  //i位置可以作为将
+                isWin = backtrack(cards); //递归
+                cards[i] += 2; //恢复现场
             }
             if(isWin) break;
         }
@@ -26,24 +26,29 @@ public class RuleUtil {
         return true;
     }
 
-    public static boolean process(int[] cards) {
-        if(isAllZero(cards)) {
+    /**
+     * 进入递归方法的手牌已经被处理完将牌了，因此只需判断坎和顺子即可
+     * @param cards
+     * @return
+     */
+    public static boolean backtrack(int[] cards) {
+        if(isAllLQZero(cards)) { //递归出口，是否已经胡牌
             return true;
         }
         boolean isWin = false;
-        for(int i = 0; i < 36; i++) {
-            if(cards[i] >= 3) {
+        for(int i = 11; i < 36; i++) {
+            if(cards[i] >= 3) { //是否可以组成坎
                 cards[i] -= 3;
-                isWin = process(cards);
-                cards[i] += 3;
+                isWin = backtrack(cards);
+                cards[i] += 3; //恢复现场
             }
             if(isWin) break;
-            if(cards[i] > 0 || cards[i] == -1) {
-                if((cards[i+1] > 0 || cards[i+1] == -1) && (cards[i+2] > 0 || cards[i+2] == -1)) {
+            if(cards[i] > 0 || cards[i] == -1) { //这个位置是否有手牌
+                if((cards[i+1] > 0 || cards[i+1] == -1) && (cards[i+2] > 0 || cards[i+2] == -1)) { //是否有顺子
                     cards[i]--; cards[i+1]--; cards[i+2]--;
-                    isWin = process(cards);
-                    cards[i]++; cards[i+1]++; cards[i+2]++;
-                } else {
+                    isWin = backtrack(cards);
+                    cards[i]++; cards[i+1]++; cards[i+2]++; //恢复现场
+                } else { //剪枝
                     return false;
                 }
             }
@@ -52,9 +57,9 @@ public class RuleUtil {
         return isWin;
     }
 
-    public static boolean isAllZero(int[] cards) {
+    public static boolean isAllLQZero(int[] cards) {
         for (int card : cards) {
-            if (card > 0) {
+            if (card > 0 || card == -1) {
                 return false;
             }
         }
