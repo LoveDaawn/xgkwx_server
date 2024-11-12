@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class WebSocketInitialization {
+public class WebSocketInitialization implements Runnable{
     private static final Logger log = LoggerFactory.getLogger(WebSocketInitialization.class);
 
     @Resource
@@ -50,6 +50,19 @@ public class WebSocketInitialization {
         } finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
+        }
+    }
+
+    @Override
+    public void run() {
+        try {
+            init();
+        } catch (InterruptedException e) {
+            log.error(e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        } catch (Throwable e) {
+            log.error(e.getMessage());
         }
     }
 }

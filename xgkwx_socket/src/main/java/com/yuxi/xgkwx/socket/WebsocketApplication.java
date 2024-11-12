@@ -13,11 +13,11 @@ public class WebsocketApplication {
     @Resource
     private WebSocketInitialization websocketInitialization;
 
-//    @PostConstruct
+    @PostConstruct
     public void start() {
         try {
             log.info(Thread.currentThread().getName() + ":websocket启动中......");
-            websocketInitialization.init();
+            new Thread(websocketInitialization).start();
             log.info(Thread.currentThread().getName() + ":websocket启动成功！！！");
         } catch (Exception e) {
             log.error("websocket发生错误：",e);
