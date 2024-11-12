@@ -1,6 +1,6 @@
 package com.yuxi.xgkwx.adapter.driver.restful.usermng;
 
-import com.yuxi.xgkwx.application.usermng.dto.UserRegisterDto;
+import com.yuxi.xgkwx.application.usermng.dto.UserRegisterReqDto;
 import com.yuxi.xgkwx.application.usermng.UserService;
 import com.yuxi.xgkwx.common.res.CommonResponse;
 import com.yuxi.xgkwx.common.utils.ResponseUtil;
@@ -21,7 +21,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public CommonResponse<Long> register(@RequestBody /*@Valid*/ UserRegisterDto userDto) {
+    public CommonResponse<Long> register(@RequestBody @Valid UserRegisterReqDto userDto) {
         log.info("message in...");
         long register = userService.register(userDto);
         return ResponseUtil.responsSuccess(register);

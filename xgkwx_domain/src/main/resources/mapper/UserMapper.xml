@@ -2,8 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuxi.xgkwx.domain.usermng.mapper.UserMapper">
     <insert id="registerNewUser" parameterType="com.yuxi.xgkwx.domain.usermng.User">
-        INSERT INTO user (user_id, unify_id, username, phone, nickname, ranking, coin, insert_time, update_time)
-        VALUES(#{userId}, #{unifyId}, #{username},#{phone}, #{nickname},
+        INSERT INTO user (user_id, unify_id, phone, nickname, ranking, coin, insert_time, update_time)
+        VALUES(#{userId}, #{unifyId},#{phone}, #{nickname},
                #{ranking},#{coin},#{insertTime},#{updateTime})
     </insert>
 
