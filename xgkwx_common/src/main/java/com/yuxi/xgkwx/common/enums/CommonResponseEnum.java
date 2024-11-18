@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum CommonResponseEnum {
-    SUCCESS("0000", "成功");
+    SUCCESS("200", "成功");
 
     private String code;
     private String msg;

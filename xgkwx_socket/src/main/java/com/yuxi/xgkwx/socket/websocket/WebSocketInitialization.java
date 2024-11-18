@@ -31,19 +31,15 @@ public class WebSocketInitialization implements Runnable{
         //workerGroup工作线程组，主要负责网络IO读写
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
-
             //启动辅助类
-            ServerBootstrap serverBootstrap = new ServerBootstrap();
-            //bootstrap绑定两个线程组
-            serverBootstrap.group(bossGroup, workerGroup);
-            //设置通道为NioChannel
-            serverBootstrap.channel(NioServerSocketChannel.class);
-            //可以对入站\出站事件进行日志记录，从而方便我们进行问题排查。
-            serverBootstrap.handler(new LoggingHandler(LogLevel.INFO));
-            //设置自定义的通道初始化器，用于入站操作
-            serverBootstrap.childHandler(websocketChannelInitializer);
+            ServerBootstrap server = new ServerBootstrap();
+            server.group(bossGroup, workerGroup)       //bootstrap绑定两个线程组
+            .channel(NioServerSocketChannel.class)              //设置通道为NioChannel
+            .handler(new LoggingHandler(LogLevel.INFO))         //可以对入站\出站事件进行日志记录，从而方便我们进行问题排查。
+            .childHandler(websocketChannelInitializer);         //设置自定义的通道初始化器，用于入站操作
+
             //启动服务器,本质是Java程序发起系统调用，然后内核底层起了一个处于监听状态的服务，生成一个文件描述符FD
-            ChannelFuture channelFuture = serverBootstrap.bind(port).sync();
+            ChannelFuture channelFuture = server.bind(port).sync();
             //异步
             channelFuture.channel().closeFuture().sync();
 
