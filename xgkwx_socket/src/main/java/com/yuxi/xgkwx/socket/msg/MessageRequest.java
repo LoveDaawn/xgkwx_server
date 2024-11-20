@@ -1,11 +1,12 @@
 package com.yuxi.xgkwx.socket.msg;
 
 import lombok.Data;
+import lombok.Getter;
 import lombok.experimental.Accessors;
 
-@Data
-@Accessors(chain = true)
+@Getter
 public class MessageRequest {
     private Long unionId;
-
+    private String messageType;
+    private String username;
 }

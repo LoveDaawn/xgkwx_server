@@ -15,6 +15,7 @@
         <module>xgkwx_application</module>
         <module>xgkwx_socket</module>
         <module>xgkwx_boot</module>
+        <module>xgkwx_testClient</module>
     </modules>
 
     <properties>

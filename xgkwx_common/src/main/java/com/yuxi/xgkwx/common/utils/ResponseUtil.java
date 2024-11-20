@@ -11,4 +11,5 @@ public class ResponseUtil {
         res.setMessage(CommonResponseEnum.SUCCESS.getMsg());
         return res;
     }
+
 }

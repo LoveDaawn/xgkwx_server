@@ -13,6 +13,11 @@ public class CommonException extends RuntimeException{
         this.msg = msg;
     }
 
+    public CommonException(CommonExceptionEnum commonExceptionEnum) {
+        this.code = commonExceptionEnum.getCode();
+        this.msg = commonExceptionEnum.getMsg();
+    }
+
     /**
      * 不写入堆栈信息，提高性能
      */
