@@ -3,10 +3,14 @@ package com.yuxi.xgkwx.socket.websocket;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerExpectContinueHandler;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
+import io.netty.handler.codec.json.JsonObjectDecoder;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.Data;
@@ -28,11 +32,16 @@ public class WebSocketChannelInitializer extends ChannelInitializer<SocketChanne
         //获取pipeline通道
         ChannelPipeline pipeline = socketChannel.pipeline();
 
+        pipeline.addLast(new StringEncoder())
+                .addLast(new StringDecoder())
+                .addLast(new JsonObjectDecoder());
+
+
         // 通过管道，添加handler处理器
         // HttpServerCodec 是由netty自己提供的助手类，此处可以理解为管道中的拦截器
         // 当请求到服务端，我们需要进行做解码，相应到客户端做编码
         // websocket 基于http协议，所以需要有http的编解码器
-//        pipeline.addLast(new HttpServerCodec());
+//        pipeline.addLast(new JsonObjectDecoder());
 //        pipeline.addLast(new HttpServerExpectContinueHandler());
         //添加对大数据流的支持，以块方式写，添加ChunkedWriteHandler处理器
 //        pipeline.addLast(new ChunkedWriteHandler());

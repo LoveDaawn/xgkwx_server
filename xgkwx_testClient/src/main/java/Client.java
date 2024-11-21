@@ -1,23 +1,11 @@
-import java.net.InetSocketAddress;
-import java.net.URI;
-import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.util.Iterator;
-import java.util.Scanner;
-import java.util.Set;
-
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.http.*;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import io.netty.handler.codec.http.websocketx.WebSocketFrame;
-import io.netty.handler.stream.ChunkedWriteHandler;
+import io.netty.handler.codec.json.JsonObjectDecoder;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,8 +29,11 @@ public class Client {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
                             // 客户端处理器
-                            ch.pipeline()/*.addLast(new HttpServerCodec())
-                                    .addLast(new HttpServerExpectContinueHandler())*/
+                            ch.pipeline()
+                                    .addLast(new StringEncoder())
+                                    .addLast(new StringDecoder())
+                                    .addLast(new JsonObjectDecoder())
+//                                    .addLast(new HttpServerExpectContinueHandler())
 //                                    .addLast(new ChunkedWriteHandler())  // 解码器
                                     .addLast(new ClientHandler());   // 客户端自定义逻辑
                         }
@@ -50,8 +41,7 @@ public class Client {
 
             // 连接到服务器
             ChannelFuture future = bootstrap.connect("localhost", 10001).syncUninterruptibly();
-            future.channel().writeAndFlush("123");
-
+            future.channel().writeAndFlush("{\"message\":\"Hello, Server!\"}");
             Thread.sleep(1000);
 //            future.channel().writeAndFlush(Unpooled.copiedBuffer("hello netty again!".getBytes()));
             // 等待直到连接关闭
@@ -73,13 +63,7 @@ public class Client {
         @Override
         protected void channelRead0(ChannelHandlerContext channelHandlerContext, Object o) throws Exception {
             try {
-                ByteBuf buf = (ByteBuf) o;
-                byte[] req = new byte[buf.readableBytes()];
-                buf.readBytes(req);
-
-                String body = new String(req, "utf-8");
-                System.out.println("Client :" + body );
-                String response = "收到服务器端的返回信息：" + body;
+                System.out.println("Client :" + o );
             } finally {
                 ReferenceCountUtil.release(o);
             }

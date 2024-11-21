@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum GameMsgEnums {
 
-    CREATE_ROOM("1", "建立房间");
+    CREATE_ROOM("CREATE_ROOM", "建立房间");
 
 
     private String code;

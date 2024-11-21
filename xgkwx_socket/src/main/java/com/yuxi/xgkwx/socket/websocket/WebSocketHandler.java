@@ -1,28 +1,14 @@
 package com.yuxi.xgkwx.socket.websocket;
 
-import com.alibaba.fastjson.JSON;
-import com.yuxi.xgkwx.common.enums.GameMsgEnums;
-import com.yuxi.xgkwx.socket.msg.MessageRequest;
 import com.yuxi.xgkwx.socket.room.RoomServiceImpl;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 自定义助手类
@@ -65,6 +51,7 @@ public class WebSocketHandler extends SimpleChannelInboundHandler {
             default:
                 //do nothing
         }*/
+        ctx.channel().writeAndFlush("{\"message\":\"Hello, Client!\"}");
     }
 
     @Override

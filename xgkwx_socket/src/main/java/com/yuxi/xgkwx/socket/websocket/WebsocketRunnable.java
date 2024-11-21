@@ -1,6 +1,6 @@
 package com.yuxi.xgkwx.socket.websocket;
 
-import com.yuxi.xgkwx.socket.msg.MessageRequest;
+import com.yuxi.xgkwx.socket.msg.req.MessageRequest;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import org.slf4j.Logger;
