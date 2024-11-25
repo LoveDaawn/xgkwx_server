@@ -21,15 +21,15 @@ public class UserService {
 
     public long register(UserRegisterReqDto userDto) {
         DateTime now = DateTime.now();
-        User user = new User();
-        user.setUserId(SnowUtil.getSnowflakeNextId());
-        user.setUnifyId(userDto.getUnifyId());
-        user.setPhone(userDto.getPhone());
-        user.setNickname(userDto.getNickname());
-        user.setRanking(0);
-        user.setCoin(10000);
-        user.setInsertTime(now.toString(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM)));
-        user.setUpdateTime(now.toString(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM)));
+        User user = new User()
+                .setUserId(SnowUtil.getSnowflakeNextId())
+                .setUnifyId(userDto.getUnifyId())
+                .setPhone(userDto.getPhone())
+                .setNickname(userDto.getNickname())
+                .setRanking(0)
+                .setCoin(10000)
+                .setInsertTime(now.toString(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM)))
+                .setUpdateTime(now.toString(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM)));
         return userRepository.registerNewUser(user);
     }
 }
