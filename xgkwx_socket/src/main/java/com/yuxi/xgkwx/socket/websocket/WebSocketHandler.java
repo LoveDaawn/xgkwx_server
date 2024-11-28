@@ -1,5 +1,9 @@
 package com.yuxi.xgkwx.socket.websocket;
 
+import com.alibaba.fastjson.JSON;
+import com.yuxi.xgkwx.common.enums.GameMsgEnums;
+import com.yuxi.xgkwx.common.exception.CommonException;
+import com.yuxi.xgkwx.socket.msg.req.MessageRequest;
 import com.yuxi.xgkwx.socket.room.RoomServiceImpl;
 import io.netty.channel.*;
 import io.netty.channel.group.ChannelGroup;
@@ -9,6 +13,8 @@ import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import java.util.Objects;
 
 /**
  * 自定义助手类
@@ -32,7 +38,7 @@ public class WebSocketHandler extends SimpleChannelInboundHandler {
     public void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
         // 获得客户端传输过来的消息
         log.info("接受到的数据：{}", msg.toString());
-/*
+
         // 1. 获取客户端发来的消息并且解析
         MessageRequest messageRequest = JSON.parseObject(msg.toString(), MessageRequest.class);
         GameMsgEnums msgType = GameMsgEnums.getGameMsgByCode(messageRequest.getMessageType());
@@ -48,9 +54,12 @@ public class WebSocketHandler extends SimpleChannelInboundHandler {
             case CREATE_ROOM:
                 roomService.createRoom(ctx, messageRequest);
                 break;
+            case JOIN_ROOM:
+                break;
             default:
+                throw new CommonException("500", "游戏服务异常");
                 //do nothing
-        }*/
+        }
         ctx.channel().writeAndFlush("{\"message\":\"Hello, Client!\"}");
     }
 

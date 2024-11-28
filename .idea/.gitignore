@@ -7,3 +7,5 @@
 /dataSources/
 /dataSources.local.xml
 /git_toolbox_prj.xml
+# GitHub Copilot persisted chat sessions
+/copilot/chatSessions

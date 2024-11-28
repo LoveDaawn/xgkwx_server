@@ -1,8 +1,7 @@
 package com.yuxi.xgkwx.socket.room;
 
-import com.yuxi.xgkwx.common.exception.CommonException;
-import com.yuxi.xgkwx.common.exception.CommonExceptionEnum;
-import com.yuxi.xgkwx.socket.msg.req.room.CreateRoomMsgReq;
+import com.alibaba.fastjson2.JSON;
+import com.yuxi.xgkwx.socket.msg.req.content.CreateRoomContent;
 import com.yuxi.xgkwx.socket.msg.req.MessageRequest;
 import com.yuxi.xgkwx.socket.websocket.WebSocketHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -19,8 +18,8 @@ public class RoomServiceImpl {
     private RoomManager roomManager;
 
     public void createRoom(ChannelHandlerContext ctx, MessageRequest messageRequest) {
-//        log.info("{}创建房间...", messageRequest.getUsername());
-//        CreateRoomMsgReq crm = (CreateRoomMsgReq) messageRequest;
+        log.info("{}创建房间...", messageRequest.getUserId());
+        CreateRoomContent content = JSON.parseObject(messageRequest.getContent(), CreateRoomContent.class);
 //        roomManager.createRoom(crm.getRoomId(), ctx.channel());
     }
 
