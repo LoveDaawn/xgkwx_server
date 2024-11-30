@@ -13,9 +13,14 @@ public class CommonException extends RuntimeException{
         this.msg = msg;
     }
 
-    public CommonException(CommonExceptionEnum commonExceptionEnum) {
-        this.code = commonExceptionEnum.getCode();
-        this.msg = commonExceptionEnum.getMsg();
+    public CommonException(CommonExceptionEnums commonExceptionEnums) {
+        this.code = commonExceptionEnums.getCode();
+        this.msg = commonExceptionEnums.getMsg();
+    }
+
+    public CommonException(GameExceptionEnums gameExceptionEnums) {
+        this.code = gameExceptionEnums.getCode();
+        this.msg = gameExceptionEnums.getMsg();
     }
 
     /**

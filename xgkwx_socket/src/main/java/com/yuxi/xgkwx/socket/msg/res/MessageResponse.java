@@ -1,4 +1,16 @@
 package com.yuxi.xgkwx.socket.msg.res;
 
-public class MessageResponse {
+import lombok.Data;
+import lombok.experimental.Accessors;
+
+@Data
+@Accessors(chain = true)
+public class MessageResponse<T> {
+    private String code;
+    private String msg;
+    private T responseContent;
+
+    public MessageResponse (T t) {
+        this.responseContent = t;
+    }
 }

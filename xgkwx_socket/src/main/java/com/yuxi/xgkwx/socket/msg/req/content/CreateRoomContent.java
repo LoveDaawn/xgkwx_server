@@ -5,8 +5,9 @@ import lombok.Data;
 import java.util.Map;
 
 @Data
-public class CreateRoomContent {
+public class
+CreateRoomContent {
     private Integer playersNum;
-    private String nickname;
+    private String nickName;
     private Map<String, String> rules;
 }

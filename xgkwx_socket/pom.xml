@@ -26,7 +26,10 @@
             <groupId>com.yuxi</groupId>
             <artifactId>xgkwx_common</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.yuxi</groupId>
+            <artifactId>xgkwx_adapter</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

@@ -14,7 +14,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 自定义助手类
@@ -55,6 +59,13 @@ public class WebSocketHandler extends SimpleChannelInboundHandler {
                 roomService.createRoom(ctx, messageRequest);
                 break;
             case JOIN_ROOM:
+                roomService.joinRoom(ctx, messageRequest);
+                break;
+            case LEAVE_ROOM:
+                break;
+            case PREPARE:
+                break;
+            case UNPREPARE:
                 break;
             default:
                 throw new CommonException("500", "游戏服务异常");
@@ -79,7 +90,7 @@ public class WebSocketHandler extends SimpleChannelInboundHandler {
 
     /**
      * 客户端连接到服务端之后(打开链接)
-     * @param ctx
+     * @param ctx ChannelHandlerContext
      */
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) {
@@ -92,7 +103,7 @@ public class WebSocketHandler extends SimpleChannelInboundHandler {
 
     /**
      * 关闭连接，移除channel
-     * @param ctx
+     * @param ctx ChannelHandlerContext
      */
     @Override
     public void handlerRemoved(ChannelHandlerContext ctx) {
@@ -105,8 +116,8 @@ public class WebSocketHandler extends SimpleChannelInboundHandler {
 
     /**
      * 发生异常并且捕获，移除channel
-     * @param ctx
-     * @param cause
+     * @param ctx ChannelHandlerContext
+     * @param cause 异常
      */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
