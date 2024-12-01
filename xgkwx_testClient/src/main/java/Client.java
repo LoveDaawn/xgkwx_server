@@ -41,8 +41,19 @@ public class Client {
 
             // 连接到服务器
             ChannelFuture future = bootstrap.connect("localhost", 10001).syncUninterruptibly();
-            future.channel().writeAndFlush("{\"message\":\"Hello, Server!\"}");
-            Thread.sleep(1000);
+            future.channel().writeAndFlush("{    \n" +
+                    "    \"unifyId\": \"1321331531123531223\",\n" +
+                    "    \"messageType\": \"CREATE_ROOM\",\n" +
+                    "    \"content\": {\n" +
+                    "        \"playsNum\": \"3\",\n" +
+                    "        \"nickname\": \"player1\"\n" +
+                    "        \"rule\": {\n" +
+                    "            \"SK\": \"y\",\n" +
+                    "            \"PPH\": \"4\" //碰碰胡 4倍\n" +
+                    "        }\n" +
+                    "    },\n" +
+                    "    \"sendTime\": \"2024/11/18 23:22:16.796\"\n" +
+                    "}");
 //            future.channel().writeAndFlush(Unpooled.copiedBuffer("hello netty again!".getBytes()));
             // 等待直到连接关闭
             future.channel().closeFuture().sync();

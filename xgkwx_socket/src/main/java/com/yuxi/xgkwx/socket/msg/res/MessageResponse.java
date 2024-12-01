@@ -10,6 +10,8 @@ public class MessageResponse<T> {
     private String msg;
     private T responseContent;
 
+    public MessageResponse() {}
+
     public MessageResponse (T t) {
         this.responseContent = t;
     }

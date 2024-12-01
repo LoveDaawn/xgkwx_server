@@ -1,5 +1,6 @@
 package com.yuxi.xgkwx.domain.gaming.room;
 
+import com.yuxi.xgkwx.domain.gaming.player.PlayerChannelVo;
 import com.yuxi.xgkwx.domain.gaming.rule.RuleVO;
 import io.netty.channel.Channel;
 import lombok.Data;
@@ -12,8 +13,8 @@ import java.util.Map;
 @Accessors(chain = true)
 public class RoomVo {
     private String roomId;
-    private List<String> players;
+    private List<PlayerChannelVo> players;
     private String roomType;
     private Map<String, String> rules;
-    private List<Channel> roomConn;
+    private String roomMaster;
 }

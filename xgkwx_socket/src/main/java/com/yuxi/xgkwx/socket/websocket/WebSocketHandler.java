@@ -14,11 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 自定义助手类
@@ -27,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Component
 @ChannelHandler.Sharable
-public class WebSocketHandler extends SimpleChannelInboundHandler {
+public class WebSocketHandler extends SimpleChannelInboundHandler<String> {
 
     private final static Logger log = LoggerFactory.getLogger(WebSocketHandler.class);
 
@@ -39,43 +35,50 @@ public class WebSocketHandler extends SimpleChannelInboundHandler {
 
 
     @Override
-    public void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
+    public void channelRead0(ChannelHandlerContext ctx, String msg) {
         // 获得客户端传输过来的消息
-        log.info("接受到的数据：{}", msg.toString());
+        log.info("接受到的数据：{}", msg);
+        try {
+            // 1. 获取客户端发来的消息并且解析
+            MessageRequest messageRequest = JSON.parseObject(msg, MessageRequest.class);
+            GameMsgEnums msgType = GameMsgEnums.getGameMsgByCode(messageRequest.getMessageType());
+            // 获取channel
+            Channel currentChannel = ctx.channel();
+            String currentChannelId = currentChannel.id().asLongText();
+            String currentChannelIdShort = currentChannel.id().asShortText();
+            log.info("客户端currentChannelId:{}", currentChannelId);
+            log.info("客户端currentChannelIdShort:{}", currentChannelIdShort);
 
-        // 1. 获取客户端发来的消息并且解析
-        MessageRequest messageRequest = JSON.parseObject(msg.toString(), MessageRequest.class);
-        GameMsgEnums msgType = GameMsgEnums.getGameMsgByCode(messageRequest.getMessageType());
-        // 获取channel
-        Channel currentChannel = ctx.channel();
-        String currentChannelId = currentChannel.id().asLongText();
-        String currentChannelIdShort = currentChannel.id().asShortText();
-        log.info("客户端currentChannelId:{}", currentChannelId);
-        log.info("客户端currentChannelIdShort:{}", currentChannelIdShort);
-
-        // 2. 判断消息类型，根据不同的类型来处理不同的业务
-        switch (Objects.requireNonNull(msgType)) {
-            case CREATE_ROOM:
-                roomService.createRoom(ctx, messageRequest);
-                break;
-            case JOIN_ROOM:
-                roomService.joinRoom(ctx, messageRequest);
-                break;
-            case LEAVE_ROOM:
-                break;
-            case PREPARE:
-                break;
-            case UNPREPARE:
-                break;
-            default:
-                throw new CommonException("500", "游戏服务异常");
-                //do nothing
+            // 2. 判断消息类型，根据不同的类型来处理不同的业务
+            switch (Objects.requireNonNull(msgType)) {
+                case CREATE_ROOM:
+                    roomService.createRoom(ctx, messageRequest);
+                    break;
+                case JOIN_ROOM:
+                    roomService.joinRoom(ctx, messageRequest);
+                    break;
+                case LEAVE_ROOM:
+                    roomService.leaveRoom(ctx, messageRequest);
+                    break;
+                case PREPARE:
+                    roomService.prepare(ctx, messageRequest);
+                    break;
+                case CANCEL_PREPARE:
+                    roomService.cancelPrepare(ctx, messageRequest);
+                    break;
+                default:
+                    throw new CommonException("500", "游戏服务异常");
+                    //do nothing
+            }
+        } catch (CommonException e) {
+            log.error("消息处理异常，code={}, info={}", e.getCode(), e.getMsg(), e);
+        } catch (Throwable e) {
+            log.error("系统异常", e);
         }
-        ctx.channel().writeAndFlush("{\"message\":\"Hello, Client!\"}");
     }
 
     @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+    public void channelReadComplete(ChannelHandlerContext ctx) {
         ctx.flush();
     }
 
@@ -84,8 +87,8 @@ public class WebSocketHandler extends SimpleChannelInboundHandler {
      * 通道激活方法
      */
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        System.err.println("server channel active..");
+    public void channelActive(ChannelHandlerContext ctx) {
+        log.info("server channel active..");
     }
 
     /**

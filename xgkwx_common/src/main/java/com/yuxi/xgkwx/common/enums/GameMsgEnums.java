@@ -9,9 +9,14 @@ public enum GameMsgEnums {
 
     CREATE_ROOM("CREATE_ROOM", "建立房间"),
     JOIN_ROOM("JOIN_ROOM", "加入房间"),
+    PLAYER_JOINED("PLAYER_JOINED", "玩家加入"), //后端发给前端
     LEAVE_ROOM("LEAVE_ROOM", "'离开房间"),
+    ROOM_DISSOLVED("ROOM_DISSOLVED", "房间已解散"), //后端发给前端
+    PLAYER_LEAVE("PLAYER_LEAVE", "玩家离开"), //后端发给前端
     PREPARE("PREPARE", "准备"),
-    UNPREPARE("UNPREPARE", "取消准备"),
+    PLAYER_PREPARED("", "玩家已准备"), //后端发给前端
+    CANCEL_PREPARE("CANCEL_PREPARE", "取消准备"),
+    PLAYER_CANCELED_PREPARATION("PLAYER_CANCELED_PREPARATION", "玩家取消准备"), //后端发给前端
     GAME_START("GAME_START", "开始游戏"),
     GAME_INIT("GAME_INIT", "初始化游戏"), //后端发给前端
     IN("IN", "进牌"),
@@ -33,8 +38,8 @@ public enum GameMsgEnums {
     ;
 
 
-    private String code;
-    private String info;
+    private final String code;
+    private final String info;
 
     public static GameMsgEnums getGameMsgByCode(String code) {
         for(GameMsgEnums e : GameMsgEnums.values()) {
