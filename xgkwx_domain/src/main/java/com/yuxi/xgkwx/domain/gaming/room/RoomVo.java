@@ -1,8 +1,6 @@
 package com.yuxi.xgkwx.domain.gaming.room;
 
 import com.yuxi.xgkwx.domain.gaming.player.PlayerChannelVo;
-import com.yuxi.xgkwx.domain.gaming.rule.RuleVO;
-import io.netty.channel.Channel;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -17,4 +15,6 @@ public class RoomVo {
     private String roomType;
     private Map<String, String> rules;
     private String roomMaster;
+    private GameInfo gameInfo;
+    private boolean gameStart = false;
 }
