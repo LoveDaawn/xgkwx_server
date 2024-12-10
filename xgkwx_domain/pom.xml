@@ -23,8 +23,14 @@
             <artifactId>xgkwx_common</artifactId>
         </dependency>
         <dependency>
+<<<<<<< Updated upstream
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
+=======
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>compile</scope>
+>>>>>>> Stashed changes
         </dependency>
     </dependencies>
 

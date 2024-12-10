@@ -27,9 +27,17 @@
             <artifactId>xgkwx_common</artifactId>
         </dependency>
         <dependency>
+<<<<<<< Updated upstream
             <groupId>com.yuxi</groupId>
             <artifactId>xgkwx_adapter</artifactId>
         </dependency>
+=======
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+>>>>>>> Stashed changes
     </dependencies>
 
     <build>

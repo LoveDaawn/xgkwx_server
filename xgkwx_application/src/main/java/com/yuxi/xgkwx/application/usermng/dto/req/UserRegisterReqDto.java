@@ -1,4 +1,4 @@
-package com.yuxi.xgkwx.application.usermng.dto;
+package com.yuxi.xgkwx.application.usermng.dto.req;
 
 import lombok.Data;
 

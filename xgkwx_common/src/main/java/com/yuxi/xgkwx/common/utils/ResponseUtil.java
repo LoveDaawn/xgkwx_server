@@ -13,5 +13,12 @@ public class ResponseUtil {
     }
 
 
+    public static <T> CommonResponse<T> responsError(String code, String message) {
+        CommonResponse<T> res = new CommonResponse<>();
+        res.setSuccess(false);
+        res.setCode(code);
+        res.setMessage(message);
+        return res;
+    }
 
 }

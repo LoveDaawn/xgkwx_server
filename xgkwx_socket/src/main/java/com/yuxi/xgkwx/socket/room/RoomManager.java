@@ -154,7 +154,6 @@ public class RoomManager {
         return MessageResponseUtils.responseSuccess();
     }
 
-
     private RoomVo getRoomVo(MessageRequest messageRequest) {
         String roomId = playersToRoomMap.get(messageRequest.getUnifyId());
         return roomManagerChannelMap.get(roomId);

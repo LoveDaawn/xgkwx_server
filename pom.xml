@@ -97,6 +97,13 @@
                 <artifactId>spring-boot-autoconfigure</artifactId>
                 <version>3.0.0</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>1.18.34</version> <!-- or latest version -->
+                <scope>provided</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -104,8 +111,23 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-site-plugin</artifactId>
-                <version>3.12.1</version>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.10.1</version> <!-- Use a more recent version -->
+                <configuration>
+                    <source>17</source> <!-- Java version -->
+                    <target>17</target> <!-- Java version -->
+                    <compilerArgs>
+                        <arg>--add-opens=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</arg> <!-- Use add-opens instead -->
+                    </compilerArgs>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.34</version> <!-- Ensure the correct version -->
+                        </path>
+                    </annotationProcessorPaths>
+                    <fork>true</fork>
+                </configuration>
             </plugin>
         </plugins>
     </build>

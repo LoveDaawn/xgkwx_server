@@ -7,6 +7,42 @@
                #{ranking},#{coin},#{insertTime},#{updateTime})
     </insert>
 
+    <resultMap id="UserResultMap" type="com.yuxi.xgkwx.domain.usermng.User">
+        <result property="userId" column="user_id"/>
+        <result property="unifyId" column="unify_id"/>
+        <result property="memberStatus" column="member_status"/>
+        <result property="memberExpire" column="member_expire"/>
+        <result property="insertTime" column="insert_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
 
+    <select id="getUserInfoById" parameterType="java.lang.String" resultMap="UserResultMap">
+        SELECT *
+        FROM user
+        WHERE unify_id = #{unifyId}
+    </select>
+
+    <select id="getUserPasswordById" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT password
+        FROM user
+        WHERE unify_id = #{unifyId}
+    </select>
+
+    <update id="updateUserPassword" parameterType="com.yuxi.xgkwx.domain.usermng.User">
+        UPDATE user
+        SET password = #{password}, update_time = #{updateTime}
+        WHERE user_id = #{userId}
+    </update>
+
+    <update id="updateUserInfo" parameterType="com.yuxi.xgkwx.domain.usermng.User">
+        UPDATE user
+        SET nickname = #{nickname}, email = #{email}, phone = #{phone}
+        WHERE user_id = #{userId}
+    </update>
+
+    <delete id="deleteUserById" parameterType="java.lang.String">
+        DELETE FROM user
+        WHERE user_id = #{unifyId}
+    </delete>
 
 </mapper>
