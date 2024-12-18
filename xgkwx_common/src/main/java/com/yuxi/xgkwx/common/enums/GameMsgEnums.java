@@ -24,16 +24,14 @@ public enum GameMsgEnums {
     OUT("OUT", "出牌"),
     OUT_PROP("OUT_PROP", "广播出牌"), //后端发给前端
     ACK("ACK", "确认"),
-    WAIT_PENG("WAIT_PENG", "等待碰牌"), //后端发给前端
+    WAIT_OP("WAIT_PENG", "等待决策"), //后端发给前端
     WAIT("WAIT", "等待读秒"), //后端发给前端
     SKIP("SKIP", "过"),
     END_WAIT("END_WAIT", "等待结束"),//后端发给前端
     PENG("PENG", "碰"),
     PENG_PROP("PENG_PROP", "确认碰牌"), //后端发给前端
-    WAIT_GANG("WAIT_GANG", "等待杠牌"), //后端发给前端
     GANG("GANG", "碰"),
     GANG_PROP("GANG_PROP", "确认杠牌"), //后端发给前端
-    WAIT_WIN("WAIT_WIN", "等待胡牌"), //后端发给前端
     WIN("WIN", "胡"),
     CONFIRM_WIN("CONFIRM_WIN", "确认胡牌"), //后端发给前端
     ;

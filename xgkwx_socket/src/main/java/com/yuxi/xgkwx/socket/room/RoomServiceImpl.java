@@ -2,10 +2,10 @@ package com.yuxi.xgkwx.socket.room;
 
 import com.alibaba.fastjson.JSONObject;
 import com.yuxi.xgkwx.socket.msg.req.MessageRequest;
+import com.yuxi.xgkwx.socket.msg.req.content.OutContent;
 import com.yuxi.xgkwx.socket.msg.res.MessageResponse;
 import com.yuxi.xgkwx.socket.msg.res.room.CreateRoomMsgRes;
 import com.yuxi.xgkwx.socket.msg.res.room.JoinRoomMsgRes;
-import com.yuxi.xgkwx.socket.websocket.WebSocketHandler;
 import io.netty.channel.ChannelHandlerContext;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
@@ -62,8 +62,17 @@ public class RoomServiceImpl {
 
     public void startGame(ChannelHandlerContext ctx, MessageRequest messageRequest) {
         log.info("游戏开始...");
-        //创建房间
+        //开始游戏
         MessageResponse<Void> mr = roomHandler.startGame(messageRequest);
+        //回送消息
+        ctx.channel().writeAndFlush(JSONObject.toJSONString(mr));
+    }
+
+    public void cardOut(ChannelHandlerContext ctx, MessageRequest messageRequest) {
+        OutContent content = JSONObject.parseObject(messageRequest.getContent(), OutContent.class);
+        log.info("玩家id：{}，第{}巡，出牌：{}", messageRequest.getUnifyId(),content.getRound(), content.getCard());
+        //出牌
+        MessageResponse<Void> mr = roomHandler.cardOut(messageRequest, content);
         //回送消息
         ctx.channel().writeAndFlush(JSONObject.toJSONString(mr));
     }

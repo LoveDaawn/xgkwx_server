@@ -5,7 +5,7 @@ import com.yuxi.xgkwx.common.enums.GameMsgEnums;
 import com.yuxi.xgkwx.common.exception.GameExceptionEnums;
 import com.yuxi.xgkwx.domain.gaming.room.RoomVo;
 import com.yuxi.xgkwx.socket.msg.req.MessageRequest;
-import com.yuxi.xgkwx.socket.msg.req.content.DefaultContent;
+import com.yuxi.xgkwx.socket.msg.res.content.DefaultContent;
 import io.netty.channel.Channel;
 import org.springframework.stereotype.Service;
 

@@ -13,6 +13,7 @@ import com.yuxi.xgkwx.socket.msg.req.MessageRequest;
 import com.yuxi.xgkwx.socket.msg.req.content.*;
 import com.yuxi.xgkwx.socket.msg.res.MessageResponse;
 import com.yuxi.xgkwx.socket.msg.res.MessageResponseUtils;
+import com.yuxi.xgkwx.socket.msg.res.content.*;
 import com.yuxi.xgkwx.socket.msg.res.room.CreateRoomMsgRes;
 import com.yuxi.xgkwx.socket.msg.res.room.JoinRoomMsgRes;
 import io.netty.channel.Channel;
@@ -184,17 +185,32 @@ public class RoomHandler {
         //庄家再进一张牌
         String roomMaster = roomVo.getRoomMaster();
         String card = gameInfo.cardIn(roomMaster);
+        //进牌消息
         messageService.sendCustomMessage(roomVo.selectPlayer(roomMaster).getChannel(), GameMsgEnums.IN, roomMaster, new CardInContent(card, "30")); //TODO: 配置读取
+        //等待决策消息
+        messageService.sendCustomMessage(roomVo.selectPlayer(roomMaster).getChannel(), GameMsgEnums.WAIT_OP, roomMaster,
+                new WaitOpContent(true, false, false, false, "30"));
         //其他玩家收到【玩家进牌】消息
         roomVo.getPlayers().forEach(player -> {
             //除了庄家
             if (!roomMaster.equals(player.getUnifyId())) {
                 //向其他玩家广播【玩家进牌】消息
                 messageService.sendCustomMessage(player.getChannel(), GameMsgEnums.PLAYER_IN, player.getUnifyId(), new OtherPlayerInContent(roomMaster, "30"));
+                //广播等待决策消息
+                messageService.sendCustomMessage(player.getChannel(), GameMsgEnums.WAIT, player.getUnifyId(), new DefaultContent("30"));
             }
         });
+        return MessageResponseUtils.responseSuccess();
+    }
 
-
+    public MessageResponse<Void> cardOut(MessageRequest messageRequest, OutContent content) {
+        RoomVo roomVo = getRoomVo(messageRequest);
+        //广播出牌消息
+        roomVo.getPlayers().forEach(player -> {
+            messageService.sendCustomMessage(player.getChannel(), GameMsgEnums.OUT_PROP, player.getUnifyId(),
+                    new CardOutContent(content.getCard(), messageRequest.getUnifyId(), content.getRound()));
+        });
+        //碰、杠、胡牌检测
         return MessageResponseUtils.responseSuccess();
     }
 
