@@ -13,6 +13,29 @@ public class GameUtils {
                 return String.valueOf(i + 10000);
             }
         }
-        throw new CommonException(GameExceptionEnums.MESSAGE_TYPE_ERROR);
+        throw new CommonException(GameExceptionEnums.ROOM_REACH_LIMITED);
     }
+
+    public static String arrayToString(short[] cards) {
+        StringBuffer sb = new StringBuffer();
+        for(int i = 0; i < cards.length; i++) {
+            if(cards[i] > 0) {
+                appendCard(sb, i, cards[i]);
+            } else if(cards[i] == -1) {
+                appendCard(sb, i, 1);
+            }
+        }
+        if(sb.isEmpty()) {
+            return "";
+        }
+        return sb.substring(0, sb.length() - 1);
+    }
+
+    private static void appendCard(StringBuffer sb, int i, int num) {
+        for(int k = 0; k < num; k++) {
+            sb.append(i);
+            sb.append(",");
+        }
+    }
+
 }

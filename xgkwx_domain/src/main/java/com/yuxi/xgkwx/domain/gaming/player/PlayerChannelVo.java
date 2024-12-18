@@ -10,4 +10,5 @@ import lombok.Data;
 public class PlayerChannelVo {
     private String unifyId;
     private Channel channel;
+    private boolean prepared;
 }

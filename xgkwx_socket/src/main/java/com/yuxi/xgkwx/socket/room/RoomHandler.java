@@ -6,6 +6,7 @@ import com.yuxi.xgkwx.common.exception.CommonException;
 import com.yuxi.xgkwx.common.exception.GameExceptionEnums;
 import com.yuxi.xgkwx.common.utils.GameUtils;
 import com.yuxi.xgkwx.domain.gaming.player.PlayerChannelVo;
+import com.yuxi.xgkwx.domain.gaming.room.GameInfo;
 import com.yuxi.xgkwx.domain.gaming.room.RoomVo;
 import com.yuxi.xgkwx.socket.msg.MessageService;
 import com.yuxi.xgkwx.socket.msg.req.MessageRequest;
@@ -26,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Component
-public class RoomManager {
+public class RoomHandler {
     // 用户管理所有房间，由房间号进行索引
     private static volatile Map<String, RoomVo> roomManagerChannelMap;
 
@@ -35,6 +36,8 @@ public class RoomManager {
 
     @Resource
     private MessageService messageService;
+
+    private GameInfo gameInfo;
 
     @PostConstruct
     public void init() {
@@ -52,7 +55,7 @@ public class RoomManager {
         RoomVo roomVo = new RoomVo();
         //创建房间对玩家映射的列表
         List<PlayerChannelVo> players = new CopyOnWriteArrayList<>();
-        players.add(new PlayerChannelVo(messageRequest.getUnifyId(), channel));
+        players.add(new PlayerChannelVo(messageRequest.getUnifyId(), channel, false));
         String roomId = GameUtils.genRoomId();
         roomVo.setRoomId(roomId)
                 .setPlayers(players)
@@ -83,7 +86,7 @@ public class RoomManager {
         //通知房间内所有玩家有新玩家加入
         messageService.sendSignalMessageToAllPlayers(roomVo, GameMsgEnums.PLAYER_JOINED);
         //将新玩家加入到房间中
-        roomVo.getPlayers().add(new PlayerChannelVo(messageRequest.getUnifyId(), channel));
+        roomVo.getPlayers().add(new PlayerChannelVo(messageRequest.getUnifyId(), channel, false));
         JoinRoomMsgRes r = new JoinRoomMsgRes(roomVo.getRules());
         playersToRoomMap.put(messageRequest.getUnifyId(), content.getRoomId());
         return MessageResponseUtils.responseSuccess(r);
@@ -138,6 +141,11 @@ public class RoomManager {
      */
     public MessageResponse<Void> prepare(MessageRequest messageRequest) {
         RoomVo roomVo = getRoomVo(messageRequest);
+        PlayerChannelVo playerChannelVo = roomVo.selectPlayer(messageRequest.getUnifyId());
+        if(playerChannelVo == null) {
+            return MessageResponseUtils.responseFail(GameExceptionEnums.FIND_PLAYER_ERROR);
+        }
+        playerChannelVo.setPrepared(true);
         //向房间内所有玩家广播玩家准备消息
         messageService.sendSignalMessageToAllPlayers(roomVo, GameMsgEnums.PLAYER_PREPARED);
         return MessageResponseUtils.responseSuccess();
@@ -149,8 +157,36 @@ public class RoomManager {
      */
     public MessageResponse<Void> cancelPrepare(MessageRequest messageRequest) {
         RoomVo roomVo = getRoomVo(messageRequest);
+        PlayerChannelVo playerChannelVo = roomVo.selectPlayer(messageRequest.getUnifyId());
+        if(playerChannelVo == null) {
+            return MessageResponseUtils.responseFail(GameExceptionEnums.FIND_PLAYER_ERROR);
+        }
+        playerChannelVo.setPrepared(false);
         //向房间内所有玩家广播玩家取消准备消息
         messageService.sendSignalMessageToAllPlayers(roomVo, GameMsgEnums.PLAYER_CANCELED_PREPARATION);
+        return MessageResponseUtils.responseSuccess();
+    }
+
+    public MessageResponse<Void> startGame(MessageRequest messageRequest) {
+        RoomVo roomVo = getRoomVo(messageRequest);
+        roomVo.setBanker(roomVo.getRoomMaster());
+        if(roomVo.getPlayers().size() != 3 || !roomVo.getPlayers().stream().allMatch(PlayerChannelVo::isPrepared)) {
+            return MessageResponseUtils.responseFail(GameExceptionEnums.PLAYER_UNPREPARED);
+        }
+
+        //初始化游戏信息，给所有玩家发牌
+        gameInfo = new GameInfo();
+        gameInfo.init(roomVo.getPlayers());
+        roomVo.getPlayers().forEach(player -> {
+            short[] playerHandCards = gameInfo.getPlayerCardsMap().get(player.getUnifyId()).getPlayerHandCards();
+            messageService.sendCustomMessage(player.getChannel(), GameMsgEnums.GAME_INIT, player.getUnifyId(), GameUtils.arrayToString(playerHandCards));
+        });
+
+        //庄家再进一张牌
+        String roomMaster = roomVo.getRoomMaster();
+        String card = gameInfo.cardIn(roomMaster);
+        messageService.sendCustomMessage(roomVo.selectPlayer(roomMaster).getChannel(), GameMsgEnums.IN, roomMaster, card);
+
         return MessageResponseUtils.responseSuccess();
     }
 

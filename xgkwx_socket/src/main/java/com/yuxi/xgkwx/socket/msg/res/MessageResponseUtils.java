@@ -1,6 +1,7 @@
 package com.yuxi.xgkwx.socket.msg.res;
 
 import com.yuxi.xgkwx.common.enums.CommonResponseEnum;
+import com.yuxi.xgkwx.common.exception.GameExceptionEnums;
 
 public class MessageResponseUtils {
 
@@ -15,6 +16,13 @@ public class MessageResponseUtils {
         MessageResponse<Void> res = new MessageResponse<>();
         res.setCode(CommonResponseEnum.SUCCESS.getCode());
         res.setMsg(CommonResponseEnum.SUCCESS.getMsg());
+        return res;
+    }
+
+    public static MessageResponse<Void> responseFail(GameExceptionEnums gee) {
+        MessageResponse<Void> res = new MessageResponse<>();
+        res.setCode(gee.getCode());
+        res.setMsg(gee.getMsg());
         return res;
     }
 }

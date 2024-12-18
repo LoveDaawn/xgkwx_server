@@ -15,15 +15,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class RoomServiceImpl {
 
-    private final static Logger log = LoggerFactory.getLogger(WebSocketHandler.class);
+    private final static Logger log = LoggerFactory.getLogger(RoomServiceImpl.class);
 
     @Resource
-    private RoomManager roomManager;
+    private RoomHandler roomHandler;
 
     public void createRoom(ChannelHandlerContext ctx, MessageRequest messageRequest) {
         log.info("{}创建房间...", messageRequest.getUnifyId());
         //创建房间
-        MessageResponse<CreateRoomMsgRes> mr = roomManager.createRoom(ctx.channel(), messageRequest);
+        MessageResponse<CreateRoomMsgRes> mr = roomHandler.createRoom(ctx.channel(), messageRequest);
         //回送消息
         ctx.channel().writeAndFlush(JSONObject.toJSONString(mr));
     }
@@ -31,7 +31,7 @@ public class RoomServiceImpl {
     public void joinRoom(ChannelHandlerContext ctx, MessageRequest messageRequest) {
         log.info("{}加入房间...", messageRequest.getUnifyId());
         //加入房间
-        MessageResponse<JoinRoomMsgRes> mr = roomManager.joinRoom(ctx.channel(), messageRequest);
+        MessageResponse<JoinRoomMsgRes> mr = roomHandler.joinRoom(ctx.channel(), messageRequest);
         //回送消息
         ctx.channel().writeAndFlush(JSONObject.toJSONString(mr));
     }
@@ -39,7 +39,7 @@ public class RoomServiceImpl {
     public void leaveRoom(ChannelHandlerContext ctx, MessageRequest messageRequest) {
         log.info("{}离开房间...", messageRequest.getUnifyId());
         // 离开房间
-        MessageResponse<Void> mr = roomManager.leaveRoom(messageRequest);
+        MessageResponse<Void> mr = roomHandler.leaveRoom(messageRequest);
         // 回送消息
         ctx.channel().writeAndFlush(JSONObject.toJSONString(mr));
     }
@@ -47,7 +47,7 @@ public class RoomServiceImpl {
     public void prepare(ChannelHandlerContext ctx, MessageRequest messageRequest) {
         log.info("{}玩家准备...", messageRequest.getUnifyId());
         // 离开房间
-        MessageResponse<Void> mr = roomManager.prepare(messageRequest);
+        MessageResponse<Void> mr = roomHandler.prepare(messageRequest);
         // 回送消息
         ctx.channel().writeAndFlush(JSONObject.toJSONString(mr));
     }
@@ -55,8 +55,16 @@ public class RoomServiceImpl {
     public void cancelPrepare(ChannelHandlerContext ctx, MessageRequest messageRequest) {
         log.info("{}玩家取消准备...", messageRequest.getUnifyId());
         // 离开房间
-        MessageResponse<Void> mr = roomManager.cancelPrepare(messageRequest);
+        MessageResponse<Void> mr = roomHandler.cancelPrepare(messageRequest);
         // 回送消息
+        ctx.channel().writeAndFlush(JSONObject.toJSONString(mr));
+    }
+
+    public void startGame(ChannelHandlerContext ctx, MessageRequest messageRequest) {
+        log.info("游戏开始...");
+        //创建房间
+        MessageResponse<Void> mr = roomHandler.startGame(messageRequest);
+        //回送消息
         ctx.channel().writeAndFlush(JSONObject.toJSONString(mr));
     }
 }

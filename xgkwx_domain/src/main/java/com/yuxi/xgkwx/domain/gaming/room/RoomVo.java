@@ -14,7 +14,18 @@ public class RoomVo {
     private List<PlayerChannelVo> players;
     private String roomType;
     private Map<String, String> rules;
-    private String roomMaster;
+    private String roomMaster; //房主
+    private String banker; //庄家
     private GameInfo gameInfo;
     private boolean gameStart = false;
+
+    public PlayerChannelVo selectPlayer(String unifyId) {
+        if(unifyId == null) return null;
+        for(PlayerChannelVo playerChannelVo : players) {
+            if(unifyId.equals(playerChannelVo.getUnifyId())) {
+                return playerChannelVo;
+            }
+        }
+        return null;
+    }
 }

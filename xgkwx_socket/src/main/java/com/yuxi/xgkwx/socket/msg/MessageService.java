@@ -51,6 +51,22 @@ public class MessageService {
     }
 
     /**
+     * 发送自定义消息，content的info内容为customMessage
+     *
+     * @param channel 连接channel
+     * @param gme     消息类型枚举
+     * @param unifyId 用户id
+     * @param customMessage 自定义消息体
+     */
+    public void sendCustomMessage(Channel channel, GameMsgEnums gme, String unifyId, String customMessage) {
+        MessageRequest mq = new MessageRequest()
+                .setMessageType(gme.getCode())
+                .setContent(JSONObject.toJSONString(new DefaultContent(customMessage)))
+                .setUnifyId(unifyId);
+        channel.writeAndFlush(JSONObject.toJSONString(mq));
+    }
+
+    /**
      * 发送错误类消息
      *
      * @param channel 连接channel

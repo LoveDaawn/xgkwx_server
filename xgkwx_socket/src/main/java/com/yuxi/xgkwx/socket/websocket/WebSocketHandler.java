@@ -3,6 +3,7 @@ package com.yuxi.xgkwx.socket.websocket;
 import com.alibaba.fastjson.JSON;
 import com.yuxi.xgkwx.common.enums.GameMsgEnums;
 import com.yuxi.xgkwx.common.exception.CommonException;
+import com.yuxi.xgkwx.socket.game.GameServiceImpl;
 import com.yuxi.xgkwx.socket.msg.req.MessageRequest;
 import com.yuxi.xgkwx.socket.room.RoomServiceImpl;
 import io.netty.channel.*;
@@ -32,6 +33,9 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<String> {
 
     @Resource
     private RoomServiceImpl roomService;
+
+    @Resource
+    private GameServiceImpl gameService;
 
 
     @Override
@@ -66,6 +70,8 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<String> {
                 case CANCEL_PREPARE:
                     roomService.cancelPrepare(ctx, messageRequest);
                     break;
+                case GAME_START:
+                    roomService.startGame(ctx, messageRequest);
                 default:
                     throw new CommonException("500", "游戏服务异常");
                     //do nothing
