@@ -10,8 +10,7 @@ import com.yuxi.xgkwx.domain.gaming.room.GameInfo;
 import com.yuxi.xgkwx.domain.gaming.room.RoomVo;
 import com.yuxi.xgkwx.socket.msg.MessageService;
 import com.yuxi.xgkwx.socket.msg.req.MessageRequest;
-import com.yuxi.xgkwx.socket.msg.req.content.CreateRoomContent;
-import com.yuxi.xgkwx.socket.msg.req.content.JoinRoomContent;
+import com.yuxi.xgkwx.socket.msg.req.content.*;
 import com.yuxi.xgkwx.socket.msg.res.MessageResponse;
 import com.yuxi.xgkwx.socket.msg.res.MessageResponseUtils;
 import com.yuxi.xgkwx.socket.msg.res.room.CreateRoomMsgRes;
@@ -179,13 +178,22 @@ public class RoomHandler {
         gameInfo.init(roomVo.getPlayers());
         roomVo.getPlayers().forEach(player -> {
             short[] playerHandCards = gameInfo.getPlayerCardsMap().get(player.getUnifyId()).getPlayerHandCards();
-            messageService.sendCustomMessage(player.getChannel(), GameMsgEnums.GAME_INIT, player.getUnifyId(), GameUtils.arrayToString(playerHandCards));
+            messageService.sendCustomMessage(player.getChannel(), GameMsgEnums.GAME_INIT, player.getUnifyId(), new DefaultContent(GameUtils.arrayToString(playerHandCards)));
         });
 
         //庄家再进一张牌
         String roomMaster = roomVo.getRoomMaster();
         String card = gameInfo.cardIn(roomMaster);
-        messageService.sendCustomMessage(roomVo.selectPlayer(roomMaster).getChannel(), GameMsgEnums.IN, roomMaster, card);
+        messageService.sendCustomMessage(roomVo.selectPlayer(roomMaster).getChannel(), GameMsgEnums.IN, roomMaster, new CardInContent(card, "30")); //TODO: 配置读取
+        //其他玩家收到【玩家进牌】消息
+        roomVo.getPlayers().forEach(player -> {
+            //除了庄家
+            if (!roomMaster.equals(player.getUnifyId())) {
+                //向其他玩家广播【玩家进牌】消息
+                messageService.sendCustomMessage(player.getChannel(), GameMsgEnums.PLAYER_IN, player.getUnifyId(), new OtherPlayerInContent(roomMaster, "30"));
+            }
+        });
+
 
         return MessageResponseUtils.responseSuccess();
     }

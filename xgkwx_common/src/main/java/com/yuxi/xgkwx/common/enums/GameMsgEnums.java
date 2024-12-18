@@ -19,7 +19,8 @@ public enum GameMsgEnums {
     PLAYER_CANCELED_PREPARATION("PLAYER_CANCELED_PREPARATION", "玩家取消准备"), //后端发给前端
     GAME_START("GAME_START", "开始游戏"),
     GAME_INIT("GAME_INIT", "初始化游戏"), //后端发给前端
-    IN("IN", "进牌"),
+    IN("IN", "进牌"),//后端发给前端
+    PLAYER_IN("PLAYER_IN", "玩家进牌"), //后端发给前端
     OUT("OUT", "出牌"),
     OUT_PROP("OUT_PROP", "广播出牌"), //后端发给前端
     ACK("ACK", "确认"),
