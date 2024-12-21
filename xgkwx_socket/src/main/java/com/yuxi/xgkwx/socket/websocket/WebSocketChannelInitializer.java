@@ -34,7 +34,8 @@ public class WebSocketChannelInitializer extends ChannelInitializer<SocketChanne
 
         pipeline.addLast(new StringEncoder())
                 .addLast(new StringDecoder())
-                .addLast(new JsonObjectDecoder());
+                .addLast(new JsonObjectDecoder())
+                .addLast(new HttpServerCodec());
 
 
         // 通过管道，添加handler处理器

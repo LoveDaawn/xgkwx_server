@@ -3,6 +3,7 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.json.JsonObjectDecoder;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
@@ -33,6 +34,7 @@ public class Client {
                                     .addLast(new StringEncoder())
                                     .addLast(new StringDecoder())
                                     .addLast(new JsonObjectDecoder())
+                                    .addLast(new HttpClientCodec())
 //                                    .addLast(new HttpServerExpectContinueHandler())
 //                                    .addLast(new ChunkedWriteHandler())  // 解码器
                                     .addLast(new ClientHandler());   // 客户端自定义逻辑
