@@ -5,18 +5,23 @@ import com.yuxi.xgkwx.common.enums.GameMsgEnums;
 import com.yuxi.xgkwx.common.exception.GameExceptionEnums;
 import com.yuxi.xgkwx.domain.gaming.room.RoomVo;
 import com.yuxi.xgkwx.socket.msg.req.MessageRequest;
+import com.yuxi.xgkwx.socket.msg.res.MessageResponse;
 import com.yuxi.xgkwx.socket.msg.res.content.DefaultContent;
 import io.netty.channel.Channel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class MessageService {
 
-    public void sendSignalMessageToAllPlayers(RoomVo roomVo, GameMsgEnums gme) {
+    private final static Logger log = LoggerFactory.getLogger(MessageService.class);
+
+    public void sendSignalMessageToAllPlayers(RoomVo roomVo, GameMsgEnums gme, String content) {
         //遍历房间内的玩家列表
         roomVo.getPlayers().forEach(player -> {
-            //通知玩家有有玩家准备
-            sendSignalMessage(player.getChannel(), gme, player.getUnifyId());
+            //通知玩家有有玩家加入
+            sendSignalMessage(player.getChannel(), gme, player.getUnifyId(), content);
         });
     }
 
@@ -32,7 +37,7 @@ public class MessageService {
                 .setMessageType(gme.getCode())
                 .setContent(JSONObject.toJSONString(new DefaultContent(gme.getInfo())))
                 .setUnifyId(unifyId);
-        channel.writeAndFlush(JSONObject.toJSONString(mq));
+        sendMessage(channel, mq);
     }
 
     /**
@@ -42,12 +47,12 @@ public class MessageService {
      * @param gme     消息类型枚举
      * @param unifyId 用户id
      */
-    public void sendSignalMessage(Channel channel, GameMsgEnums gme, String unifyId) {
+    public void sendSignalMessage(Channel channel, GameMsgEnums gme, String unifyId, String content) {
         MessageRequest mq = new MessageRequest()
                 .setMessageType(gme.getCode())
-                .setContent(JSONObject.toJSONString(new DefaultContent(unifyId)))
+                .setContent(JSONObject.toJSONString(new DefaultContent(content)))
                 .setUnifyId(unifyId);
-        channel.writeAndFlush(JSONObject.toJSONString(mq));
+        sendMessage(channel, mq);
     }
 
     /**
@@ -63,7 +68,7 @@ public class MessageService {
                 .setMessageType(gme.getCode())
                 .setContent(JSONObject.toJSONString(customMessage))
                 .setUnifyId(unifyId);
-        channel.writeAndFlush(JSONObject.toJSONString(mq));
+        sendMessage(channel, mq);
     }
 
     /**
@@ -78,6 +83,15 @@ public class MessageService {
                 .setMessageType(gee.getCode())
                 .setContent(JSONObject.toJSONString(new DefaultContent(gee.getMsg())))
                 .setUnifyId(unifyId);
-        channel.writeAndFlush(JSONObject.toJSONString(mq));
+        sendMessage(channel, mq);
+    }
+
+    public void sendMessage(Channel channel, MessageRequest mq) {
+        log.info("发送消息, 玩家id: {}, 消息内容: {}",mq.getUnifyId(), JSONObject.toJSONString(mq));
+    }
+
+    public void sendMessage(Channel channel, MessageResponse mr) {
+        log.info("回复消息, channelId: {}, 消息内容: {}",channel.id().asShortText(), JSONObject.toJSONString(mr));
+
     }
 }

@@ -1,6 +1,7 @@
 package com.yuxi.xgkwx.socket.room;
 
 import com.alibaba.fastjson.JSONObject;
+import com.yuxi.xgkwx.socket.msg.MessageService;
 import com.yuxi.xgkwx.socket.msg.req.MessageRequest;
 import com.yuxi.xgkwx.socket.msg.req.content.OutContent;
 import com.yuxi.xgkwx.socket.msg.res.MessageResponse;
@@ -20,12 +21,15 @@ public class RoomServiceImpl {
     @Resource
     private RoomHandler roomHandler;
 
+    @Resource
+    private MessageService messageService;
+
     public void createRoom(ChannelHandlerContext ctx, MessageRequest messageRequest) {
         log.info("{}创建房间...", messageRequest.getUnifyId());
         //创建房间
         MessageResponse<CreateRoomMsgRes> mr = roomHandler.createRoom(ctx.channel(), messageRequest);
         //回送消息
-        ctx.channel().writeAndFlush(JSONObject.toJSONString(mr));
+        messageService.sendMessage(ctx.channel(), mr);
     }
 
     public void joinRoom(ChannelHandlerContext ctx, MessageRequest messageRequest) {
@@ -33,7 +37,7 @@ public class RoomServiceImpl {
         //加入房间
         MessageResponse<JoinRoomMsgRes> mr = roomHandler.joinRoom(ctx.channel(), messageRequest);
         //回送消息
-        ctx.channel().writeAndFlush(JSONObject.toJSONString(mr));
+        messageService.sendMessage(ctx.channel(), mr);
     }
 
     public void leaveRoom(ChannelHandlerContext ctx, MessageRequest messageRequest) {
@@ -41,7 +45,7 @@ public class RoomServiceImpl {
         // 离开房间
         MessageResponse<Void> mr = roomHandler.leaveRoom(messageRequest);
         // 回送消息
-        ctx.channel().writeAndFlush(JSONObject.toJSONString(mr));
+        messageService.sendMessage(ctx.channel(), mr);
     }
 
     public void prepare(ChannelHandlerContext ctx, MessageRequest messageRequest) {
@@ -49,7 +53,7 @@ public class RoomServiceImpl {
         // 离开房间
         MessageResponse<Void> mr = roomHandler.prepare(messageRequest);
         // 回送消息
-        ctx.channel().writeAndFlush(JSONObject.toJSONString(mr));
+        messageService.sendMessage(ctx.channel(), mr);
     }
 
     public void cancelPrepare(ChannelHandlerContext ctx, MessageRequest messageRequest) {
@@ -57,7 +61,7 @@ public class RoomServiceImpl {
         // 离开房间
         MessageResponse<Void> mr = roomHandler.cancelPrepare(messageRequest);
         // 回送消息
-        ctx.channel().writeAndFlush(JSONObject.toJSONString(mr));
+        messageService.sendMessage(ctx.channel(), mr);
     }
 
     public void startGame(ChannelHandlerContext ctx, MessageRequest messageRequest) {
@@ -65,7 +69,7 @@ public class RoomServiceImpl {
         //开始游戏
         MessageResponse<Void> mr = roomHandler.startGame(messageRequest);
         //回送消息
-        ctx.channel().writeAndFlush(JSONObject.toJSONString(mr));
+        messageService.sendMessage(ctx.channel(), mr);
     }
 
     public void cardOut(ChannelHandlerContext ctx, MessageRequest messageRequest) {
@@ -74,6 +78,6 @@ public class RoomServiceImpl {
         //出牌
         MessageResponse<Void> mr = roomHandler.cardOut(messageRequest, content);
         //回送消息
-        ctx.channel().writeAndFlush(JSONObject.toJSONString(mr));
+        messageService.sendMessage(ctx.channel(), mr);
     }
 }

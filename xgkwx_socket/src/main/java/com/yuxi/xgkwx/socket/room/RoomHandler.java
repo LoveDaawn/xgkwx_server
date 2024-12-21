@@ -83,12 +83,12 @@ public class RoomHandler {
             messageService.sendDefaultErrorMessage(channel, GameExceptionEnums.ROOM_FULL, messageRequest.getUnifyId());
             throw new CommonException(GameExceptionEnums.ROOM_FULL);
         }
-        //通知房间内所有玩家有新玩家加入
-        messageService.sendSignalMessageToAllPlayers(roomVo, GameMsgEnums.PLAYER_JOINED);
         //将新玩家加入到房间中
         roomVo.getPlayers().add(new PlayerChannelVo(messageRequest.getUnifyId(), channel, false));
         JoinRoomMsgRes r = new JoinRoomMsgRes(roomVo.getRules());
         playersToRoomMap.put(messageRequest.getUnifyId(), content.getRoomId());
+        //通知房间内所有玩家有新玩家加入
+        messageService.sendSignalMessageToAllPlayers(roomVo, GameMsgEnums.PLAYER_JOINED, messageRequest.getUnifyId());
         return MessageResponseUtils.responseSuccess(r);
     }
 
@@ -125,7 +125,7 @@ public class RoomHandler {
                 //除了该玩家
                 if (!player.getUnifyId().equals(messageRequest.getUnifyId())) {
                     //向所有玩家广播房间玩家离开
-                    messageService.sendSignalMessage(player.getChannel(), GameMsgEnums.ROOM_DISSOLVED, player.getUnifyId());
+                    messageService.sendSignalMessage(player.getChannel(), GameMsgEnums.ROOM_DISSOLVED, player.getUnifyId(), messageRequest.getUnifyId());
                 } else {
                     //移除该玩家
                     roomVo.getPlayers().remove(player);
@@ -147,7 +147,7 @@ public class RoomHandler {
         }
         playerChannelVo.setPrepared(true);
         //向房间内所有玩家广播玩家准备消息
-        messageService.sendSignalMessageToAllPlayers(roomVo, GameMsgEnums.PLAYER_PREPARED);
+        messageService.sendSignalMessageToAllPlayers(roomVo, GameMsgEnums.PLAYER_PREPARED, messageRequest.getUnifyId());
         return MessageResponseUtils.responseSuccess();
     }
 
@@ -163,7 +163,7 @@ public class RoomHandler {
         }
         playerChannelVo.setPrepared(false);
         //向房间内所有玩家广播玩家取消准备消息
-        messageService.sendSignalMessageToAllPlayers(roomVo, GameMsgEnums.PLAYER_CANCELED_PREPARATION);
+        messageService.sendSignalMessageToAllPlayers(roomVo, GameMsgEnums.PLAYER_CANCELED_PREPARATION, messageRequest.getUnifyId());
         return MessageResponseUtils.responseSuccess();
     }
 

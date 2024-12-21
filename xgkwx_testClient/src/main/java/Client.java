@@ -37,11 +37,8 @@ public class Client {
                                     .addLast(new DelimiterBasedFrameDecoder(1024, Unpooled.copiedBuffer("%_%\r\n".getBytes())))
                                     .addLast(new StringEncoder())
                                     .addLast(new StringDecoder())
-                                    .addLast(new DelimiterBasedFrameDecoder(1024, Unpooled.copiedBuffer("%_%\r\n".getBytes())))
                                     .addLast(new DelimiterBasedEncoder("%_%\r\n"))
                                     .addLast(new JsonObjectDecoder())
-//                                    .addLast(new HttpServerExpectContinueHandler())
-//                                    .addLast(new ChunkedWriteHandler())  // 解码器
                                     .addLast(new ClientHandler());   // 客户端自定义逻辑
                         }
                     });
@@ -80,6 +77,7 @@ public class Client {
 
         @Override
         protected void channelRead0(ChannelHandlerContext channelHandlerContext, Object o) throws Exception {
+            System.out.println("helllo");
             try {
                 System.out.println("Client :" + o );
             } finally {

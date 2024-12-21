@@ -34,8 +34,7 @@ public class WebSocketChannelInitializer extends ChannelInitializer<SocketChanne
         //获取pipeline通道
         ChannelPipeline pipeline = socketChannel.pipeline();
 
-        pipeline
-                .addLast(new DelimiterBasedFrameDecoder(1024, Unpooled.copiedBuffer("%_%\r\n".getBytes())))
+        pipeline.addLast(new DelimiterBasedFrameDecoder(1024, Unpooled.copiedBuffer("%_%\r\n".getBytes())))
                 .addLast(new StringEncoder())
                 .addLast(new StringDecoder())
                 .addLast(new DelimiterBasedEncoder("%_%\r\n"))
