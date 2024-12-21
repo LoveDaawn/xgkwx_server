@@ -88,10 +88,12 @@ public class MessageService {
 
     public void sendMessage(Channel channel, MessageRequest mq) {
         log.info("发送消息, 玩家id: {}, 消息内容: {}",mq.getUnifyId(), JSONObject.toJSONString(mq));
+        channel.writeAndFlush(JSONObject.toJSONString(mq));
     }
 
     public void sendMessage(Channel channel, MessageResponse mr) {
         log.info("回复消息, channelId: {}, 消息内容: {}",channel.id().asShortText(), JSONObject.toJSONString(mr));
+        channel.writeAndFlush(JSONObject.toJSONString(mr));
 
     }
 }
