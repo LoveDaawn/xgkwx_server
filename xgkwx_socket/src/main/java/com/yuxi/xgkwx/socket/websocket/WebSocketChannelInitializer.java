@@ -1,8 +1,10 @@
 package com.yuxi.xgkwx.socket.websocket;
 
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
@@ -32,10 +34,13 @@ public class WebSocketChannelInitializer extends ChannelInitializer<SocketChanne
         //获取pipeline通道
         ChannelPipeline pipeline = socketChannel.pipeline();
 
-        pipeline.addLast(new StringEncoder())
+        pipeline
+                .addLast(new DelimiterBasedFrameDecoder(1024, Unpooled.copiedBuffer("%_%\r\n".getBytes())))
+                .addLast(new StringEncoder())
                 .addLast(new StringDecoder())
-                .addLast(new JsonObjectDecoder())
-                .addLast(new HttpServerCodec());
+                .addLast(new DelimiterBasedEncoder("%_%\r\n"))
+                .addLast(new JsonObjectDecoder());
+
 
 
         // 通过管道，添加handler处理器

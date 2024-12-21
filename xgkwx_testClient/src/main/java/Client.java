@@ -1,8 +1,11 @@
+import com.yuxi.xgkwx.socket.websocket.DelimiterBasedEncoder;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.json.JsonObjectDecoder;
 import io.netty.handler.codec.string.StringDecoder;
@@ -31,10 +34,12 @@ public class Client {
                         protected void initChannel(SocketChannel ch) throws Exception {
                             // 客户端处理器
                             ch.pipeline()
+                                    .addLast(new DelimiterBasedFrameDecoder(1024, Unpooled.copiedBuffer("%_%\r\n".getBytes())))
                                     .addLast(new StringEncoder())
                                     .addLast(new StringDecoder())
+                                    .addLast(new DelimiterBasedFrameDecoder(1024, Unpooled.copiedBuffer("%_%\r\n".getBytes())))
+                                    .addLast(new DelimiterBasedEncoder("%_%\r\n"))
                                     .addLast(new JsonObjectDecoder())
-                                    .addLast(new HttpClientCodec())
 //                                    .addLast(new HttpServerExpectContinueHandler())
 //                                    .addLast(new ChunkedWriteHandler())  // 解码器
                                     .addLast(new ClientHandler());   // 客户端自定义逻辑
