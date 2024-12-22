@@ -8,6 +8,7 @@ import com.yuxi.xgkwx.common.res.CommonResponse;
 import com.yuxi.xgkwx.common.utils.ResponseUtil;
 
 import com.alibaba.fastjson.JSONObject;
+import io.netty.util.internal.ThrowableUtil;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -25,40 +26,19 @@ public class UserController {
     @PostMapping("/register")
     public CommonResponse<Long> register(@RequestBody @Valid UserRegisterReqDto userDto) {
         CommonResponse<Long> res = new CommonResponse<>();
+        log.info("UserController.register {} req: {}", userDto.getUnifyId(), JSONObject.toJSONString(userDto));
+
         try {
-            log.info("UserController.register {} req: {}", userDto.getUnifyId(), JSONObject.toJSONString(userDto));
-            long register = userService.register(userDto);
-            res = ResponseUtil.responsSuccess(register);
+            long register_num = userService.register(userDto);
+            res = ResponseUtil.responseSuccess(register_num);
         } catch (CommonException e) {
             log.error("UserController.register error, code:{}, msg:{}", e.getCode(), e.getMessage(), e);
-            res = ResponseUtil.responsError(e.getCode(), e.getMessage());
-        } catch (Exception e) {
-            log.error("UserController.register error: 服务异常", e); // Log the full stack trace
-            res = ResponseUtil.responsError("500", "服务异常");
+            res = ResponseUtil.responseBusinessError(e);
+        } catch (Throwable e) {
+            log.error("UserController.register Error: 服务异常 ", e); // Log the full stack trace
+            res = ResponseUtil.responseError();
         } finally {
             log.info("UserController.register {} res: {}", userDto.getUnifyId(), JSONObject.toJSONString(res));
-        }
-        return res;
-    }
-
-    // 用户登录
-    @PostMapping("/login")
-    public CommonResponse<Boolean> login(@RequestBody @Valid UserLoginReqDto reqDto) {
-        CommonResponse<Boolean> res = new CommonResponse<>();
-        try {
-            if (userService.checkPassword(reqDto.getUnifyId(), reqDto.getPassword())) {
-                log.info("UserController.login req: {}", JSONObject.toJSONString(reqDto));
-                res = ResponseUtil.responsSuccess(true);
-            } else {
-                log.info("Password wrong, please try again");
-                res = ResponseUtil.responsError("200", "密码错误");
-            }
-        } catch (CommonException e) {
-            log.error("UserController.login error, code:{}, msg:{}", e.getCode(), e.getMessage(), e);
-            res = ResponseUtil.responsError(e.getCode(), e.getMessage());
-        } catch (Exception e) {
-            log.error("UserController.login error: 服务异常", e);
-            res = ResponseUtil.responsError("500", "服务异常");
         }
         return res;
     }
@@ -67,98 +47,82 @@ public class UserController {
     @GetMapping("/getUserInfo/{unifyId}")
     public CommonResponse<UserInfoRespDto> getUserInfo(@PathVariable String unifyId) {
         CommonResponse<UserInfoRespDto> res = new CommonResponse<>();
+        log.info("UserController.getUserInfo unifyId: {}", unifyId);
+
         try {
-            log.info("UserController.getUserInfo unifyId: {}", unifyId);
-            UserInfoRespDto user = userService.getUserInfo(unifyId);
-            if (user != null) {
-                res = ResponseUtil.responsSuccess(user);
-            } else {
-                log.info("User not found with unifyId: {}", unifyId);
-                res = ResponseUtil.responsError("404", "用户不存在");
-            }
+            UserInfoRespDto user_info = userService.getUserInfo(unifyId);
+            res = ResponseUtil.responseSuccess(user_info);
         } catch (CommonException e) {
             log.error("UserController.getUserInfo error, code:{}, msg:{}", e.getCode(), e.getMessage(), e);
-            res = ResponseUtil.responsError(e.getCode(), e.getMessage());
-        } catch (Exception e) {
-            log.error("UserController.getUserInfo error: 服务异常", e);
-            res = ResponseUtil.responsError("500", "服务异常");
+            res = ResponseUtil.responseBusinessError(e);
+        } catch (Throwable e) {
+            log.error("UserController.getUserInfo error: 服务异常 ", e);
+            res = ResponseUtil.responseError();
+        } finally {
+            log.info("UserController.getUserInfo res: {}", JSONObject.toJSONString(res));
         }
         return res;
     }
 
     // 更新用户的信息，包括nickname，phone，email
     @PutMapping("updateUserInfo")
-    public CommonResponse<Boolean> updateUserInfo(@RequestBody @Valid UserUpdateReqDto reqDto) {
-        CommonResponse<Boolean> res = new CommonResponse<>();
+    public CommonResponse<Long> updateUserInfo(@RequestBody @Valid UserUpdateReqDto reqDto) {
+        CommonResponse<Long> res = new CommonResponse<>();
+        log.info("UserController.updateUserInfo req: {}", JSONObject.toJSONString(reqDto));
+
         try {
-            log.info("UserController.updateUserInfo req: {}", JSONObject.toJSONString(reqDto));
-            Boolean is_success = userService.updateUserInfo(reqDto);
-            res = ResponseUtil.responsSuccess(is_success);
+            Long update_num = userService.updateUserInfo(reqDto);
+            res = ResponseUtil.responseSuccess(update_num);
         } catch (CommonException e) {
             log.error("UserController.updateUserInfo error, code:{}, msg:{}", e.getCode(), e.getMessage(), e);
-            res = ResponseUtil.responsError(e.getCode(), e.getMessage());
-        } catch (Exception e) {
+            res = ResponseUtil.responseBusinessError(e);
+        } catch (Throwable e) {
             log.error("UserController.updateUserInfo error: 服务异常", e);
-            res = ResponseUtil.responsError("500", "服务异常");
+            res = ResponseUtil.responseError();
+        } finally {
+            log.info("UserController.updateUserInfo res: {}", JSONObject.toJSONString(res));
         }
         return res;
     }
 
     // 修改用户密码
     @PutMapping("/changePassword")
-    public CommonResponse<Boolean> changePassword(@RequestBody @Valid ChangePasswordReqDto reqDto) {
-        CommonResponse<Boolean> res = new CommonResponse<>();
+    public CommonResponse<Long> changePassword(@RequestBody @Valid ChangePasswordReqDto reqDto) {
+        CommonResponse<Long> res = new CommonResponse<>();
+        log.info("UserController.changePassword req: {}", JSONObject.toJSONString(reqDto));
+
         try {
-            if (userService.checkPassword(reqDto.getUnifyId(), reqDto.getOldPassword()))  {
-                log.info("UserController.changePassword req: {}", JSONObject.toJSONString(reqDto));
-                Boolean is_success = userService.changePassword(reqDto);
-                if (is_success) {
-                    res = ResponseUtil.responsSuccess(is_success);
-                } else {
-                    String message = "No user with unifyId: " + reqDto.getUnifyId();
-                    log.info(message);
-                    res = ResponseUtil.responsError("200", message);
-                }
-            } else {
-                log.info("Password wrong, please try again");
-                res = ResponseUtil.responsError("200", "密码错误");
-            }
+            Long change_num = userService.changePassword(reqDto);
+            res = ResponseUtil.responseSuccess(change_num);
         } catch (CommonException e) {
             log.error("UserController.changePassword error, code:{}, msg:{}", e.getCode(), e.getMessage(), e);
-            res = ResponseUtil.responsError(e.getCode(), e.getMessage());
-        } catch (Exception e) {
+            res = ResponseUtil.responseBusinessError(e);
+        } catch (Throwable e) {
             log.error("UserController.changePassword error: 服务异常", e);
-            res = ResponseUtil.responsError("500", "服务异常");
+            res = ResponseUtil.responseError();
+        } finally {
+            log.info("UserController.changePassword res: {}", JSONObject.toJSONString(res));
         }
         return res;
     }
 
     // 用户注销
     @DeleteMapping("/delete")
-    public CommonResponse<Boolean> deleteUser(@RequestBody @Valid DeleteUserReqDto reqDto) {
-        CommonResponse<Boolean> res = new CommonResponse<>();
+    public CommonResponse<Long> deleteUser(@RequestBody @Valid DeleteUserReqDto reqDto) {
+        CommonResponse<Long> res = new CommonResponse<>();
+        log.info("UserController.delete req: {}", JSONObject.toJSONString(reqDto));
+
         try {
-            String unifyId = reqDto.getUnifyId();
-            if (userService.checkPassword(unifyId, reqDto.getPassword()))  {
-                log.info("UserController.deleteUser userId: {}", unifyId);
-                Boolean is_success = userService.deleteUser(unifyId);
-                if (is_success) {
-                    res = ResponseUtil.responsSuccess(is_success);
-                } else {
-                    String message = "No user with unifyId: " + reqDto.getUnifyId();
-                    log.info(message);
-                    res = ResponseUtil.responsError("200", message);
-                }
-            } else {
-                log.info("Password wrong, please try again");
-                res = ResponseUtil.responsError("200", "密码错误");
-            }
+            Long delete_num = userService.deleteUser(reqDto);
+            res = ResponseUtil.responseSuccess(delete_num);
         } catch (CommonException e) {
             log.error("UserController.deleteUser error, code:{}, msg:{}", e.getCode(), e.getMessage(), e);
-            res = ResponseUtil.responsError(e.getCode(), e.getMessage());
-        } catch (Exception e) {
+            res = ResponseUtil.responseBusinessError(e);
+        } catch (Throwable e) {
             log.error("UserController.deleteUser error: 服务异常", e);
-            res = ResponseUtil.responsError("500", "服务异常");
+            res = ResponseUtil.responseError();
+        }finally {
+            log.info("UserController.deleteUser res: {}", JSONObject.toJSONString(res));
         }
         return res;
     }

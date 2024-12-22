@@ -1,5 +1,6 @@
 package com.yuxi.xgkwx.common.res;
 
+import com.yuxi.xgkwx.common.enums.CommonResponseEnum;
 import lombok.Data;
 import lombok.ToString;
 import lombok.experimental.Accessors;

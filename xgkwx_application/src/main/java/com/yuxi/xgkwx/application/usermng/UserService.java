@@ -2,21 +2,19 @@ package com.yuxi.xgkwx.application.usermng;
 
 import com.yuxi.xgkwx.application.usermng.dto.req.*;
 import com.yuxi.xgkwx.application.usermng.dto.res.UserInfoRespDto;
+import com.yuxi.xgkwx.common.exception.CommonException;
+import com.yuxi.xgkwx.common.exception.CommonExceptionEnums;
 import com.yuxi.xgkwx.common.utils.SnowUtil;
 import com.yuxi.xgkwx.domain.usermng.User;
 import com.yuxi.xgkwx.domain.usermng.mapper.UserMapper;
 
 import cn.hutool.core.date.DateTime;
 import jakarta.annotation.Resource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 
 @Service
 public class UserService {
-    private static final Logger log = LoggerFactory.getLogger(UserService.class);
-
     @Resource
     private UserMapper userRepository;
 
@@ -52,60 +50,58 @@ public class UserService {
                     .setRanking(user.getRanking())
                     .setCoin(user.getCoin())
                     .setVoucher(user.getVoucher());
-
-            return userInfoRes;
+        } else {
+            throw new CommonException(CommonExceptionEnums.USER_NOT_FOUND);
         }
-        return null;
-    }
-
-    // 通过unifyId获取用户密码（内部使用）
-    public Boolean checkPassword(String unifyId, String password) {
-        String storedPassword = userRepository.getUserPasswordById(unifyId);
-        return storedPassword == null || storedPassword.equals(password);
+        return userInfoRes;
     }
 
     // 修改用户信息
-    public Boolean updateUserInfo(UserUpdateReqDto reqDto) {
+    public long updateUserInfo(UserUpdateReqDto reqDto) {
         User user = userRepository.getUserInfoById(reqDto.getUnifyId());
 
-        Boolean flag = false;
         if (user != null) {
             user.setNickname(reqDto.getNickname());
             user.setPhone(reqDto.getPhone());
             user.setEmail(reqDto.getEmail());
-
-            int rowsAffected = userRepository.updateUserInfo(user);
-
-            flag = (rowsAffected > 0);
+            return userRepository.updateUserInfo(user);
+        } else {
+            throw new CommonException(CommonExceptionEnums.USER_NOT_FOUND);
         }
-
-        return flag;
     }
 
     // 修改用户密码
-    public Boolean changePassword(ChangePasswordReqDto reqDto){
-        User user = userRepository.getUserInfoById(reqDto.getUnifyId());
-        System.out.println(user);
+    public long changePassword(ChangePasswordReqDto reqDto){
+        String unifyId = reqDto.getUnifyId();
+        User user = userRepository.getUserInfoById(unifyId);
 
-        Boolean flag = false;
         if (user != null){
-            DateTime now = DateTime.now();
-            String formattedTime = now.toString("yyyy-MM-dd HH:mm:ss");
+            String oldPassword = userRepository.getUserPasswordById(unifyId);
+            if (oldPassword.equals(reqDto.getOldPassword())) {
+                DateTime now = DateTime.now();
+                String formattedTime = now.toString("yyyy-MM-dd HH:mm:ss");
 
-            user.setUpdateTime(formattedTime);
-            user.setPassword(reqDto.getNewPassword());
+                // 更新密码
+                user.setUpdateTime(formattedTime);
+                user.setPassword(reqDto.getNewPassword());
 
-            int rowsAffected = userRepository.updateUserPassword(user);
-            flag = (rowsAffected > 0);
+                return userRepository.updateUserPassword(user);
+            } else {
+                throw new CommonException(CommonExceptionEnums.PASSWORD_ERROR);
+            }
+        } else {
+            throw new CommonException(CommonExceptionEnums.USER_NOT_FOUND);
         }
-
-        return flag;
     }
 
     // 删除用户
-    public Boolean deleteUser(String unifyId) {
-        int rowsAffected = userRepository.deleteUserById(unifyId);
+    public long deleteUser(DeleteUserReqDto reqDto) {
+        String unifyId = reqDto.getUnifyId();
 
-        return (rowsAffected > 0);
+        if (reqDto.getPassword().equals(userRepository.getUserPasswordById(unifyId))) {
+            return userRepository.deleteUserById(unifyId);
+        } else {
+            throw new CommonException(CommonExceptionEnums.PASSWORD_ERROR);
+        }
     }
 }

@@ -8,6 +8,7 @@ import lombok.Data;
 public class ChangePasswordReqDto {
     @NotNull
     private String unifyId;
+    @NotNull
     private String oldPassword;
     @NotBlank
     private String newPassword;
