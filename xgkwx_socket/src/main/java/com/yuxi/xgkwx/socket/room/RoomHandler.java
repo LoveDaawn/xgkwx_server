@@ -5,6 +5,7 @@ import com.yuxi.xgkwx.common.enums.GameMsgEnums;
 import com.yuxi.xgkwx.common.exception.CommonException;
 import com.yuxi.xgkwx.common.exception.GameExceptionEnums;
 import com.yuxi.xgkwx.common.utils.GameUtils;
+import com.yuxi.xgkwx.domain.gaming.player.PlayerCardsVo;
 import com.yuxi.xgkwx.domain.gaming.player.PlayerChannelVo;
 import com.yuxi.xgkwx.domain.gaming.room.GameInfo;
 import com.yuxi.xgkwx.domain.gaming.room.RoomVo;
@@ -203,11 +204,25 @@ public class RoomHandler {
     public MessageResponse<Void> cardOut(MessageRequest messageRequest, OutContent content) {
         RoomVo roomVo = getRoomVo(messageRequest);
         //广播出牌消息
-        roomVo.getPlayers().forEach(player -> messageService.sendCustomMessage(player.getChannel(), GameMsgEnums.OUT_PROP, player.getUnifyId(),
-                new CardOutContent(content.getCard(), messageRequest.getUnifyId(), content.getRound())));
+        roomVo.getPlayers().forEach(player -> {
+            //除了发牌者
+            if(!player.getUnifyId().equals(messageRequest.getUnifyId())) {
+                messageService.sendCustomMessage(player.getChannel(), GameMsgEnums.OUT_PROP, player.getUnifyId(),
+                        new CardOutContent(content.getCard(), messageRequest.getUnifyId(), content.getRound()));
+            }
+        });
         //碰、杠、胡牌检测
+        GameInfo gameInfo = roomVo.getGameInfo();
+        roomVo.getPlayers().forEach(player -> {
+            PlayerCardsVo playerCardsVo = gameInfo.getPlayerCardsMap().get(player.getUnifyId());
+        });
         return MessageResponseUtils.responseSuccess(messageRequest.getMessageId());
     }
+
+
+
+
+
 
 
     private RoomVo getRoomVo(MessageRequest messageRequest) {
