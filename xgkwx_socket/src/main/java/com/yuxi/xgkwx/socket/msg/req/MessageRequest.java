@@ -8,6 +8,7 @@ import java.io.Serializable;
 @Data
 @Accessors(chain = true)
 public class MessageRequest implements Serializable {
+    private String messageId;
     private String unifyId;
     private String messageType;
     private String content;

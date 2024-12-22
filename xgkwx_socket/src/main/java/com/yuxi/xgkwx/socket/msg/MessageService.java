@@ -25,6 +25,26 @@ public class MessageService {
         });
     }
 
+    public void sendSignalMessageExceptSelf(RoomVo roomVo, GameMsgEnums gme, String unifyId) {
+        //遍历房间内的玩家列表
+        roomVo.getPlayers().forEach(player -> {
+            if(unifyId != null && !unifyId.equals(player.getUnifyId())) {
+                //通知玩家有有玩家加入
+                sendSignalMessage(player.getChannel(), gme, player.getUnifyId(), unifyId);
+            }
+        });
+    }
+
+    public void sendCustomMessageExceptSelf(RoomVo roomVo, GameMsgEnums gme, String unifyId, Object customMessage) {
+        //遍历房间内的玩家列表
+        roomVo.getPlayers().forEach(player -> {
+            if(unifyId != null && !unifyId.equals(player.getUnifyId())) {
+                //通知玩家有有玩家加入
+                sendCustomMessage(player.getChannel(), gme, player.getUnifyId(), customMessage);
+            }
+        });
+    }
+
     /**
      * 发送通知类消息，content的info内容为gee.info
      *
@@ -91,7 +111,7 @@ public class MessageService {
         channel.writeAndFlush(JSONObject.toJSONString(mq));
     }
 
-    public void sendMessage(Channel channel, MessageResponse mr) {
+    public <T> void sendMessage(Channel channel, MessageResponse<T> mr) {
         log.info("回复消息, channelId: {}, 消息内容: {}",channel.id().asShortText(), JSONObject.toJSONString(mr));
         channel.writeAndFlush(JSONObject.toJSONString(mr));
 

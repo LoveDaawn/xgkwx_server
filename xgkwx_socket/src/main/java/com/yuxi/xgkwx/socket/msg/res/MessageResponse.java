@@ -6,6 +6,7 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class MessageResponse<T> {
+    private String ack;
     private String code;
     private String msg;
     private T responseContent;

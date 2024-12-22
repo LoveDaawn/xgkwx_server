@@ -64,7 +64,7 @@ public class RoomHandler {
         roomManagerChannelMap.put(roomId, roomVo);
         playersToRoomMap.put(messageRequest.getUnifyId(), roomId);
         CreateRoomMsgRes crm = new CreateRoomMsgRes(roomId);
-        return MessageResponseUtils.responseSuccess(crm);
+        return MessageResponseUtils.responseSuccess(crm, messageRequest.getMessageId());
     }
 
     /**
@@ -74,22 +74,24 @@ public class RoomHandler {
      */
     public MessageResponse<JoinRoomMsgRes> joinRoom(Channel channel, MessageRequest messageRequest) {
         JoinRoomContent content = JSON.parseObject(messageRequest.getContent(), JoinRoomContent.class);
+        String playerUnifyId = messageRequest.getUnifyId();
         RoomVo roomVo = roomManagerChannelMap.get(content.getRoomId());
         if (roomVo == null) {
-            messageService.sendDefaultErrorMessage(channel, GameExceptionEnums.FIND_ROOM_ERROR, messageRequest.getUnifyId());
+            messageService.sendDefaultErrorMessage(channel, GameExceptionEnums.FIND_ROOM_ERROR, playerUnifyId);
             throw new CommonException(GameExceptionEnums.FIND_ROOM_ERROR);
         }
         if (roomVo.getPlayers().size() == 3) {
-            messageService.sendDefaultErrorMessage(channel, GameExceptionEnums.ROOM_FULL, messageRequest.getUnifyId());
+            messageService.sendDefaultErrorMessage(channel, GameExceptionEnums.ROOM_FULL, playerUnifyId);
             throw new CommonException(GameExceptionEnums.ROOM_FULL);
         }
         //将新玩家加入到房间中
-        roomVo.getPlayers().add(new PlayerChannelVo(messageRequest.getUnifyId(), channel, false));
-        JoinRoomMsgRes r = new JoinRoomMsgRes(roomVo.getRules());
-        playersToRoomMap.put(messageRequest.getUnifyId(), content.getRoomId());
+        roomVo.getPlayers().add(new PlayerChannelVo(playerUnifyId, channel, false));
+        String position = roomVo.getPositionByIndex(playerUnifyId);
+        playersToRoomMap.put(playerUnifyId, content.getRoomId());
+        JoinRoomMsgRes r = new JoinRoomMsgRes(position, roomVo.getRules(), roomVo.buildPlayersInfo());
         //通知房间内所有玩家有新玩家加入
-        messageService.sendSignalMessageToAllPlayers(roomVo, GameMsgEnums.PLAYER_JOINED, messageRequest.getUnifyId());
-        return MessageResponseUtils.responseSuccess(r);
+        messageService.sendCustomMessageExceptSelf(roomVo, GameMsgEnums.PLAYER_JOINED, playerUnifyId, new PlayerJoinedContent(playerUnifyId, position));
+        return MessageResponseUtils.responseSuccess(r, messageRequest.getMessageId());
     }
 
     /**
@@ -132,7 +134,7 @@ public class RoomHandler {
                 }
             });
         }
-        return MessageResponseUtils.responseSuccess();
+        return MessageResponseUtils.responseSuccess(messageRequest.getMessageId());
     }
 
     /**
@@ -143,12 +145,12 @@ public class RoomHandler {
         RoomVo roomVo = getRoomVo(messageRequest);
         PlayerChannelVo playerChannelVo = roomVo.selectPlayer(messageRequest.getUnifyId());
         if(playerChannelVo == null) {
-            return MessageResponseUtils.responseFail(GameExceptionEnums.FIND_PLAYER_ERROR);
+            return MessageResponseUtils.responseFail(GameExceptionEnums.FIND_PLAYER_ERROR, messageRequest.getMessageId());
         }
         playerChannelVo.setPrepared(true);
         //向房间内所有玩家广播玩家准备消息
         messageService.sendSignalMessageToAllPlayers(roomVo, GameMsgEnums.PLAYER_PREPARED, messageRequest.getUnifyId());
-        return MessageResponseUtils.responseSuccess();
+        return MessageResponseUtils.responseSuccess(messageRequest.getMessageId());
     }
 
     /**
@@ -159,19 +161,19 @@ public class RoomHandler {
         RoomVo roomVo = getRoomVo(messageRequest);
         PlayerChannelVo playerChannelVo = roomVo.selectPlayer(messageRequest.getUnifyId());
         if(playerChannelVo == null) {
-            return MessageResponseUtils.responseFail(GameExceptionEnums.FIND_PLAYER_ERROR);
+            return MessageResponseUtils.responseFail(GameExceptionEnums.FIND_PLAYER_ERROR, messageRequest.getMessageId());
         }
         playerChannelVo.setPrepared(false);
         //向房间内所有玩家广播玩家取消准备消息
         messageService.sendSignalMessageToAllPlayers(roomVo, GameMsgEnums.PLAYER_CANCELED_PREPARATION, messageRequest.getUnifyId());
-        return MessageResponseUtils.responseSuccess();
+        return MessageResponseUtils.responseSuccess(messageRequest.getMessageId());
     }
 
     public MessageResponse<Void> startGame(MessageRequest messageRequest) {
         RoomVo roomVo = getRoomVo(messageRequest);
         roomVo.setBanker(roomVo.getRoomMaster());
         if(roomVo.getPlayers().size() != 3 || !roomVo.getPlayers().stream().allMatch(PlayerChannelVo::isPrepared)) {
-            return MessageResponseUtils.responseFail(GameExceptionEnums.PLAYER_UNPREPARED);
+            return MessageResponseUtils.responseFail(GameExceptionEnums.PLAYER_UNPREPARED, messageRequest.getMessageId());
         }
 
         //初始化游戏信息，给所有玩家发牌
@@ -195,18 +197,16 @@ public class RoomHandler {
                 messageService.sendCustomMessage(player.getChannel(), GameMsgEnums.PLAYER_IN, player.getUnifyId(), new OtherPlayerInContent(roomMaster, "30"));
             }
         });
-        return MessageResponseUtils.responseSuccess();
+        return MessageResponseUtils.responseSuccess(messageRequest.getMessageId());
     }
 
     public MessageResponse<Void> cardOut(MessageRequest messageRequest, OutContent content) {
         RoomVo roomVo = getRoomVo(messageRequest);
         //广播出牌消息
-        roomVo.getPlayers().forEach(player -> {
-            messageService.sendCustomMessage(player.getChannel(), GameMsgEnums.OUT_PROP, player.getUnifyId(),
-                    new CardOutContent(content.getCard(), messageRequest.getUnifyId(), content.getRound()));
-        });
+        roomVo.getPlayers().forEach(player -> messageService.sendCustomMessage(player.getChannel(), GameMsgEnums.OUT_PROP, player.getUnifyId(),
+                new CardOutContent(content.getCard(), messageRequest.getUnifyId(), content.getRound())));
         //碰、杠、胡牌检测
-        return MessageResponseUtils.responseSuccess();
+        return MessageResponseUtils.responseSuccess(messageRequest.getMessageId());
     }
 
 

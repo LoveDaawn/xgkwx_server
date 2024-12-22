@@ -1,6 +1,7 @@
 package com.yuxi.xgkwx.socket.room;
 
 import com.alibaba.fastjson.JSONObject;
+import com.yuxi.xgkwx.common.exception.CommonException;
 import com.yuxi.xgkwx.socket.msg.MessageService;
 import com.yuxi.xgkwx.socket.msg.req.MessageRequest;
 import com.yuxi.xgkwx.socket.msg.req.content.OutContent;
@@ -34,10 +35,18 @@ public class RoomServiceImpl {
 
     public void joinRoom(ChannelHandlerContext ctx, MessageRequest messageRequest) {
         log.info("{}加入房间...", messageRequest.getUnifyId());
-        //加入房间
-        MessageResponse<JoinRoomMsgRes> mr = roomHandler.joinRoom(ctx.channel(), messageRequest);
-        //回送消息
-        messageService.sendMessage(ctx.channel(), mr);
+        MessageResponse<JoinRoomMsgRes> mr = new MessageResponse<>();
+        try {
+            //加入房间
+            mr = roomHandler.joinRoom(ctx.channel(), messageRequest);
+            //回送消息
+            messageService.sendMessage(ctx.channel(), mr);
+        } catch (CommonException e) {
+            mr.setCode(e.getCode());
+            mr.setMsg(e.getMsg());
+            messageService.sendMessage(ctx.channel(), mr);
+            throw e;
+        }
     }
 
     public void leaveRoom(ChannelHandlerContext ctx, MessageRequest messageRequest) {

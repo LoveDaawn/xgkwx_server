@@ -8,5 +8,7 @@ import java.util.Map;
 @Data
 @AllArgsConstructor
 public class JoinRoomMsgRes {
+    private String position;
     private Map<String, String> rules;
+    private Map<String, String> playerInfo;
 }
