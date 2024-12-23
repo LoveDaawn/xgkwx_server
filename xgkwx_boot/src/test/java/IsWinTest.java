@@ -18,7 +18,7 @@ public class IsWinTest {
                         2,0,0,0,0,0,0,0,0,0};*/
 
         long l = System.currentTimeMillis();
-        boolean win = RuleUtil.winCheck(cards);
+        boolean win = RuleUtil.winCheck(cards, true);
         long l1 = System.currentTimeMillis();
         System.out.println("游戏结果：" + win + "，所需时间" + (l1 - l) + "ms");
     }
