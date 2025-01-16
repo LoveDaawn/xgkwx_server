@@ -10,7 +10,8 @@ public enum OperationTypeEnum {
     PENG("PENG", "碰"),
     GANG("GANG", "炮杠"),
     AN_GANG("AN_GANG", "暗杠"),
-    CA_GANG("CA_GANG", "擦杠")
+    CA_GANG("CA_GANG", "擦杠"),
+    WIN("WIN", "胡"),
     ;
 
     private String code;

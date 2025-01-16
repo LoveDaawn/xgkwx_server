@@ -4,7 +4,9 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 玩家手牌
@@ -13,10 +15,13 @@ import java.util.List;
 @Accessors(chain = true)
 public class PlayerCardsVo {
     private short[] playerHandCards;
-    private List<String> playerOutsCardMap;
+    private List<String> playerOutsCardList;
+    private Map<String, String> listenMap;
+    private boolean ldFlag = false;
 
     public PlayerCardsVo(short[] playerHandCards) {
         this.playerHandCards = playerHandCards;
-        this.playerOutsCardMap = new ArrayList<>();
+        this.playerOutsCardList = new ArrayList<>();
+        this.listenMap = new HashMap<>();
     }
 }

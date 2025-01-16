@@ -68,8 +68,10 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<String> {
                     break;
                 case GAME_START:
                     roomService.startGame(ctx, messageRequest);
+                    break;
                 case OUT:
                     roomService.cardOut(ctx, messageRequest);
+                    break;
                 default:
                     throw new CommonException("500", "游戏服务异常");
                     //do nothing

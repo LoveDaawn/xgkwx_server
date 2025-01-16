@@ -1,5 +1,7 @@
 package com.yuxi.xgkwx.domain.gaming.room;
 
+import com.yuxi.xgkwx.common.exception.CommonException;
+import com.yuxi.xgkwx.common.exception.GameExceptionEnums;
 import com.yuxi.xgkwx.domain.gaming.player.PlayerCardsVo;
 import com.yuxi.xgkwx.domain.gaming.player.PlayerChannelVo;
 import lombok.Data;
@@ -103,5 +105,18 @@ public class GameInfo {
         for(int i = 0; i < num; i++) {
             playerCard[cards[currentPointer++]]++;
         }
+    }
+
+    /**
+     * 玩家出牌
+     * @param unifyId 玩家id
+     * @param card 牌
+     */
+    public void cardOut(String unifyId, String card) {
+        short[] cards = playerCardsMap.get(unifyId).getPlayerHandCards();
+        short targetCard = Short.parseShort(card);
+        if(cards[targetCard] > 0) cards[targetCard]--;
+        else if (cards[targetCard] == -1) cards[targetCard] =  -3;
+        else throw new CommonException(GameExceptionEnums.INNER_ERROR);
     }
 }

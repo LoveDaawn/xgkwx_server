@@ -83,7 +83,7 @@ public class RoomServiceImpl {
 
     public void cardOut(ChannelHandlerContext ctx, MessageRequest messageRequest) {
         OutContent content = JSONObject.parseObject(messageRequest.getContent(), OutContent.class);
-        log.info("玩家id：{}，第{}巡，出牌：{}", messageRequest.getUnifyId(),content.getRound(), content.getCard());
+        log.info("玩家id：{}，第{}巡，出牌：{}", messageRequest.getUnifyId(), content.getRound(), content.getCard());
         //出牌
         MessageResponse<Void> mr = roomHandler.cardOut(messageRequest, content);
         //回送消息

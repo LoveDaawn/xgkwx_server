@@ -14,7 +14,7 @@ public enum GameMsgEnums {
     ROOM_DISSOLVED("ROOM_DISSOLVED", "房间已解散"), //后端发给前端
     PLAYER_LEAVE("PLAYER_LEAVE", "玩家离开"), //后端发给前端
     PREPARE("PREPARE", "准备"),
-    PLAYER_PREPARED("", "玩家已准备"), //后端发给前端
+    PLAYER_PREPARED("PLAYER_PREPARED", "玩家已准备"), //后端发给前端
     CANCEL_PREPARE("CANCEL_PREPARE", "取消准备"),
     PLAYER_CANCELED_PREPARATION("PLAYER_CANCELED_PREPARATION", "玩家取消准备"), //后端发给前端
     GAME_START("GAME_START", "开始游戏"),

@@ -11,7 +11,8 @@ public enum GameExceptionEnums {
     FIND_ROOM_ERROR("E10002", "找不到房间"),
     ROOM_FULL("E10003", "房间人数已满"),
     FIND_PLAYER_ERROR("E10004", "无法找到玩家"),
-    PLAYER_UNPREPARED("E10005", "玩家未准备！"),
+    PLAYER_UNPREPARED("E10005", "玩家未准备"),
+    INNER_ERROR("E10006", "内部逻辑错误")
     ;
 
     private String code;

@@ -4,20 +4,21 @@ import com.yuxi.xgkwx.common.exception.CommonException;
 import com.yuxi.xgkwx.common.exception.GameExceptionEnums;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RuleUtil {
     /**
      * 是否是七对
-     *
      * @param cards 手牌卡组
      * @return 龙七对龙数
      */
-    public static int isQd(short[] cards) {
+    public static int isLqd(short[] cards) {
         int flag = 0;
         for (short c : cards) {
             if (c != 0 && c != 2 && c != 4) {
-                return 0;
+                return -1;
             }
             if (c == 4) {
                 flag++;
@@ -29,17 +30,16 @@ public class RuleUtil {
 
     /**
      * 是否是七对
-     *
      * @param cards 手牌卡组
      * @return 龙七对龙数
      */
-    public static int isQd(short[] cards, short card) {
+    public static int isLqd(short[] cards, short card) {
         cardIn(cards, card);
         int flag = 0;
         for (short c : cards) {
             if (c != 0 && c != 2 && c != 4) {
                 cardOut(cards, card);
-                return 0;
+                return -1;
             }
             if (c == 4) {
                 flag++;
@@ -55,6 +55,12 @@ public class RuleUtil {
     public static boolean isQys(short[] cards, short card) {
         boolean flagP = true; //筒(饼)一色
         boolean flagS = true; //条(索)一色
+
+        //判断入牌的花色
+        if(card > 10 && card < 20) flagS = false; //筒牌
+        else if(card > 20 && card < 30) flagP = false; //索牌
+        else return false; //中发白
+
         //检测是否条一色
         int pointer = 11;
         while (pointer <= 35) {
@@ -70,6 +76,7 @@ public class RuleUtil {
                 flagS = false;
             }
             pointer++;
+            if(!flagP && !flagS) break;
         }
         return flagP || flagS;
     }
@@ -141,6 +148,7 @@ public class RuleUtil {
             cardOut(cards, (short) 14);
             cardOut(cards, (short) 16);
             flag = winCheck(cards, false);
+            //恢复现场
             cardIn(cards, (short) 14);
             cardIn(cards, (short) 16);
             return flag;
@@ -149,6 +157,7 @@ public class RuleUtil {
             cardOut(cards, (short) 24);
             cardOut(cards, (short) 26);
             flag = winCheck(cards, false);
+            //恢复现场
             cardIn(cards, (short) 24);
             cardIn(cards, (short) 26);
             return flag;
@@ -164,11 +173,11 @@ public class RuleUtil {
         cardOut(cards, card);
         for(short c : cards) {
             if(c > 0 || c == -1){
-                cardIn(cards, card);
+                cardIn(cards, card); //恢复现场
                 return false;
             }
         }
-        cardIn(cards, card);
+        cardIn(cards, card); //恢复现场
         return true;
     }
 
@@ -184,11 +193,16 @@ public class RuleUtil {
     }
 
     /**
-     * 听牌判断，如果无法听牌，返回空数组
+     * 听牌判断，如果无法听牌，返回null
      */
-    public static List<Integer> listenCheck() {
-
-        return new ArrayList<>();
+    public static List<Short> listenCheck(short[] cards) {
+        List<Short> listenCards = new ArrayList<>();
+        for(short i = 11; i <= 35; i++) {
+            if(winCheck(cards, i)) {
+                listenCards.add(i);
+            }
+        }
+        return !listenCards.isEmpty() ? listenCards : null;
     }
 
     /**
@@ -202,21 +216,17 @@ public class RuleUtil {
         cards[card]++;
         boolean flag = winCheck(cards, true);
         cards[card]--;
-        if (flag) {
-
-        }
         return flag;
     }
 
     /**
      * 是否已经胡牌
-     *
      * @param cards    手牌卡组
      * @param fullFlag 手牌是否满14张, 默认传true, 只有确定为否的时候传false
      * @return 是否已经胡牌
      */
     public static boolean winCheck(short[] cards, boolean fullFlag) {
-        if (fullFlag && isQd(cards) > 0) {
+        if (fullFlag && isLqd(cards) >= 0) {
             return true;
         }
         boolean isWin = false;
@@ -305,7 +315,9 @@ public class RuleUtil {
      * 打牌
      */
     public static void cardOut(short[] cards, short card) {
-
+        if(cards[card] == -1) cards[card]++;
+        else if (cards[card] <= 0) throw new CommonException(GameExceptionEnums.SERVER_ERROR);
+        cards[card]--;
     }
 
     public static void cardGang(short[] cards, short card) {
@@ -316,5 +328,31 @@ public class RuleUtil {
         }
     }
 
+    /**
+     * 点炮判断- 卡五星中，默认屁胡是无法胡别家打的牌，只有大胡才可以捉炮，因此需要单独判断
+     * @param cards 手牌卡组
+     * @param card  目标牌
+     * @param ldFlag  亮倒标记
+     * @param checkFlag 胡牌检测判断，true为需要检查
+     * @return 是否可以被点炮
+     */
+    public static boolean feedCheck(short[] cards, short card, boolean ldFlag, boolean checkFlag) {
+        //甚至没有赢
+        if(checkFlag && !winCheck(cards, card)) return false;
+        //已经亮倒，不必再判断
+        if(ldFlag) return true;
+        return isLqd(cards, card) >= 0 || isQys(cards, card) || checkAsgy(cards, card) > 0 || checkMsgy(cards, card) > 0 || isSzy(cards, card);
+    }
 
+
+    public static Map<String, String> listenStatus(short[] cards) {
+        Map<String, String> listenCards = new HashMap<>();
+        for(short i = 11; i <= 35; i++) {
+            if(i % 10 == 0 || i == 32 || i == 34) continue;
+            if(winCheck(cards, i)) {
+                listenCards.put(String.valueOf(i), "1");
+            }
+        }
+        return listenCards.isEmpty() ? null : listenCards;
+    }
 }
