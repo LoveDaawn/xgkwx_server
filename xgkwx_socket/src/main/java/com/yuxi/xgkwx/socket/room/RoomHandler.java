@@ -24,12 +24,9 @@ import com.yuxi.xgkwx.socket.msg.res.room.JoinRoomMsgRes;
 import io.netty.channel.Channel;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
-import org.apache.tomcat.util.digester.Rule;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -43,8 +40,6 @@ public class RoomHandler {
 
     @Resource
     private MessageService messageService;
-
-    private GameInfo gameInfo;
 
     @PostConstruct
     public void init() {
@@ -187,10 +182,10 @@ public class RoomHandler {
         if (roomVo.getPlayers().size() != 3 || !roomVo.getPlayers().stream().allMatch(PlayerChannelVo::isPrepared)) {
             return MessageResponseUtils.responseFail(GameExceptionEnums.PLAYER_UNPREPARED, messageRequest.getMessageId());
         }
-
         //初始化游戏信息，给所有玩家发牌
-        gameInfo = new GameInfo();
+        GameInfo gameInfo = new GameInfo();
         gameInfo.init(roomVo.getPlayers());
+        roomVo.setGameInfo(gameInfo);
         roomVo.getPlayers().forEach(player -> {
             short[] playerHandCards = gameInfo.getPlayerCardsMap().get(player.getUnifyId()).getPlayerHandCards();
             messageService.sendCustomMessage(player.getChannel(), GameMsgEnums.GAME_INIT, player.getUnifyId(), new DefaultContent(GameUtils.arrayToString(playerHandCards)));
@@ -220,15 +215,42 @@ public class RoomHandler {
         short[] targetPlayerCards = targetPlayerCardsVoMap.get(messageRequest.getUnifyId()).getPlayerHandCards();
         //扣减对应牌
         gameInfo.cardOut(messageRequest.getUnifyId(), content.getCard());
+
+        //首先检测碰、杠、胡牌，按照胡>杠=碰的优先级加入到通知队列中
+        Map<String, OperationCardVo> opMap = new HashMap<>();
+        roomVo.getPlayers().forEach(player -> {
+            //除了发牌者
+            if (!player.getUnifyId().equals(messageRequest.getUnifyId())) {
+                Map<String, String> listenMap = targetPlayerCardsVoMap.get(player.getUnifyId()).getListenMap();
+                short[] cards = targetPlayerCardsVoMap.get(player.getUnifyId()).getPlayerHandCards();
+                OperationCardVo operationCardVo = null;
+                //胡牌检测
+                if (listenMap.containsKey(card) && Integer.parseInt(listenMap.get(card)) > 1) {
+                    operationCardVo = new OperationCardVo(player.getUnifyId(), Short.parseShort(card), OperationTypeEnum.WIN.getCode());
+                    opMap.put(player.getUnifyId(), operationCardVo);
+                }
+                //杠牌检测
+                if(RuleUtil.gangCheck(cards, Short.parseShort(card), false)) {
+                    operationCardVo = operationCardVo == null ? new OperationCardVo(player.getUnifyId(), Short.parseShort(card), OperationTypeEnum.GANG.getCode()) : operationCardVo;
+                    opMap.put(player.getUnifyId(), new OperationCardVo(player.getUnifyId(), Short.parseShort(card), OperationTypeEnum.GANG.getCode()));
+                }
+                //碰牌检测
+                if(RuleUtil.pengCheck(cards, Short.parseShort(card))) {
+                    opMap.put(player.getUnifyId(), new OperationCardVo(player.getUnifyId(), Short.parseShort(card), OperationTypeEnum.PENG.getCode()));
+                }
+            }
+        });
+
         //广播出牌消息
         roomVo.getPlayers().forEach(player -> {
             //除了发牌者
             if (!player.getUnifyId().equals(messageRequest.getUnifyId())) {
                 messageService.sendCustomMessage(player.getChannel(), GameMsgEnums.OUT_PROP, player.getUnifyId(),
-                        new CardOutContent(card, messageRequest.getUnifyId(), content.getRound()));
+                        new CardOutContent(card, messageRequest.getUnifyId(), content.getRound(), null));
             }
         });
 
+        //听牌判断
         List<Short> listenedCards = RuleUtil.listenCheck(targetPlayerCards);
         if(!listenedCards.isEmpty()) {
             listenedCards.forEach(listenedCard -> {
@@ -239,31 +261,9 @@ public class RoomHandler {
             });
         }
 
-        //首先检测碰、杠、胡牌，按照胡>杠=碰的优先级加入到通知队列中
-        List<OperationCardVo> opList = new ArrayList<>();
-        roomVo.getPlayers().forEach(player -> {
-            //除了发牌者
-            if (!player.getUnifyId().equals(messageRequest.getUnifyId())) {
-                Map<String, String> listenMap = targetPlayerCardsVoMap.get(player.getUnifyId()).getListenMap();
-                short[] cards = targetPlayerCardsVoMap.get(player.getUnifyId()).getPlayerHandCards();
-                //胡牌检测
-                if (listenMap.containsKey(card) && Integer.parseInt(listenMap.get(card)) > 1) {
-                    opList.add(new OperationCardVo(player.getUnifyId(), Short.parseShort(card), OperationTypeEnum.WIN.getCode()));
-                }
-                //杠牌检测
-                if(RuleUtil.gangCheck(cards, Short.parseShort(card), false)) {
-                    opList.add(new OperationCardVo(player.getUnifyId(), Short.parseShort(card), OperationTypeEnum.GANG.getCode()));
-                }
-                //碰牌检测
-                if(RuleUtil.pengCheck(cards, Short.parseShort(card))) {
-                    opList.add(new OperationCardVo(player.getUnifyId(), Short.parseShort(card), OperationTypeEnum.PENG.getCode()));
-                }
-            }
-        });
-        //TODO:如果有碰杠胡，
-        if(!opList.isEmpty()) {
 
-        } else {  //如果没有碰杠胡，则将对应出牌加入到玩家出牌list中，同时进行发牌
+        //TODO:如果没有碰杠胡
+        if(opMap.isEmpty()) {  //如果没有碰杠胡，则将对应出牌加入到玩家出牌list中，同时进行发牌
             //加到对应list中
             roomVo.getGameInfo().getPlayerCardsMap().get(messageRequest.getUnifyId()).getPlayerOutsCardList().add(card);
             //获取下一个玩家
