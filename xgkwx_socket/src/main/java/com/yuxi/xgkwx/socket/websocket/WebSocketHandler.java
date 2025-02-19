@@ -33,7 +33,6 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<String> {
     @Resource
     private RoomServiceImpl roomService;
 
-
     @Override
     public void channelRead0(ChannelHandlerContext ctx, String msg) {
         // 获得客户端传输过来的消息
@@ -71,6 +70,18 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<String> {
                     break;
                 case OUT:
                     roomService.cardOut(ctx, messageRequest);
+                    break;
+                case WAIT:
+                    roomService.skip(ctx, messageRequest);
+                    break;
+                case PENG:
+                    roomService.peng(ctx, messageRequest);
+                    break;
+                case GANG:
+                    roomService.gang(ctx, messageRequest);
+                    break;
+                case WIN:
+                    roomService.win(ctx, messageRequest);
                     break;
                 default:
                     throw new CommonException("500", "游戏服务异常");

@@ -2,6 +2,7 @@ package com.yuxi.xgkwx.common.utils;
 
 import com.yuxi.xgkwx.common.exception.CommonException;
 import com.yuxi.xgkwx.common.exception.GameExceptionEnums;
+import com.yuxi.xgkwx.common.rule.enums.WinTypeEnum;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -341,7 +342,29 @@ public class RuleUtil {
         if(checkFlag && !winCheck(cards, card)) return false;
         //已经亮倒，不必再判断
         if(ldFlag) return true;
-        return isLqd(cards, card) >= 0 || isQys(cards, card) || checkAsgy(cards, card) > 0 || checkMsgy(cards, card) > 0 || isSzy(cards, card);
+        return isLqd(cards, card) >= 0 || isQys(cards, card) || checkAsgy(cards, card) > 0 || checkMsgy(cards, card) > 0 || isSzy(cards, card) || isPph(cards, card) || isKwx(cards, card);
+    }
+
+    public static List<String> queryWinType(short[] cards, short card) {
+        List<String> winTypes = new ArrayList<>();
+        if(isLqd(cards, card) == 1) winTypes.add(WinTypeEnum.LQD.getCode());
+        if(isLqd(cards, card) == 2) winTypes.add(WinTypeEnum.DOUBLE_LQD.getCode());
+        if(isLqd(cards, card) == 3) winTypes.add(WinTypeEnum.TRIPLE_LQD.getCode());
+        if(isQys(cards, card)) winTypes.add(WinTypeEnum.QYS.getCode());
+        if(checkMsgy(cards, card) > 0) {
+            if(checkMsgy(cards, card) == 1) winTypes.add(WinTypeEnum.MSGY.getCode());
+            if(checkMsgy(cards, card) == 2) winTypes.add(WinTypeEnum.DOUBLE_MSGY.getCode());
+            if(checkMsgy(cards, card) == 3) winTypes.add(WinTypeEnum.TRIPLE_MSGY.getCode());
+        }
+        if(checkAsgy(cards, card) > 0) {
+            if(checkAsgy(cards, card) == 1) winTypes.add(WinTypeEnum.ASGY.getCode());
+            if(checkAsgy(cards, card) == 2) winTypes.add(WinTypeEnum.DOUBLE_ASGY.getCode());
+            if(checkAsgy(cards, card) == 3) winTypes.add(WinTypeEnum.TRIPLE_ASGY.getCode());
+        }
+        if(isSzy(cards, card)) winTypes.add(WinTypeEnum.SZY.getCode());
+        if(isPph(cards, card)) winTypes.add(WinTypeEnum.PPH.getCode());
+        if (isKwx(cards, card)) winTypes.add(WinTypeEnum.KWX.getCode());
+        return winTypes;
     }
 
 

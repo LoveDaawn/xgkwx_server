@@ -4,10 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-public class WaitOpContent {
-    private boolean PENG;
-    private boolean GANG;
-    private boolean WIN;
+@AllArgsConstructor
+public class GangPropContent {
+    private String unifyId;
     private String card;
-    private String timeWait;
+    private String gangType;
 }

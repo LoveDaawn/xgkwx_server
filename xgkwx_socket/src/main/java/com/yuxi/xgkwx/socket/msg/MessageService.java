@@ -25,6 +25,14 @@ public class MessageService {
         });
     }
 
+    public void sendNoteMessageToAllPlayers(RoomVo roomVo, GameMsgEnums gme) {
+        //遍历房间内的玩家列表
+        roomVo.getPlayers().forEach(player -> {
+            //通知玩家有有玩家加入
+            sendNoteMessage(player.getChannel(), gme, player.getUnifyId());
+        });
+    }
+
     public void sendSignalMessageExceptSelf(RoomVo roomVo, GameMsgEnums gme, String unifyId) {
         //遍历房间内的玩家列表
         roomVo.getPlayers().forEach(player -> {
@@ -45,8 +53,16 @@ public class MessageService {
         });
     }
 
+    public void sendCustomMessageToAllPlayers(RoomVo roomVo, GameMsgEnums gme, Object customMessage) {
+        //遍历房间内的玩家列表
+        roomVo.getPlayers().forEach(player -> {
+            //通知玩家有有玩家加入
+            sendCustomMessage(player.getChannel(), gme, player.getUnifyId(), customMessage);
+        });
+    }
+
     /**
-     * 发送通知类消息，content的info内容为gee.info
+     * 发送通知类消息，content的info内容为gme.info
      *
      * @param channel 连接channel
      * @param gme     消息类型枚举

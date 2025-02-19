@@ -4,7 +4,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.yuxi.xgkwx.common.exception.CommonException;
 import com.yuxi.xgkwx.socket.msg.MessageService;
 import com.yuxi.xgkwx.socket.msg.req.MessageRequest;
+import com.yuxi.xgkwx.socket.msg.req.content.GangContent;
 import com.yuxi.xgkwx.socket.msg.req.content.OutContent;
+import com.yuxi.xgkwx.socket.msg.req.content.PengContent;
+import com.yuxi.xgkwx.socket.msg.req.content.WinContent;
 import com.yuxi.xgkwx.socket.msg.res.MessageResponse;
 import com.yuxi.xgkwx.socket.msg.res.room.CreateRoomMsgRes;
 import com.yuxi.xgkwx.socket.msg.res.room.JoinRoomMsgRes;
@@ -18,10 +21,8 @@ import org.springframework.stereotype.Service;
 public class RoomServiceImpl {
 
     private final static Logger log = LoggerFactory.getLogger(RoomServiceImpl.class);
-
     @Resource
     private RoomHandler roomHandler;
-
     @Resource
     private MessageService messageService;
 
@@ -89,4 +90,41 @@ public class RoomServiceImpl {
         //回送消息
         messageService.sendMessage(ctx.channel(), mr);
     }
+
+    public void skip(ChannelHandlerContext ctx, MessageRequest messageRequest) {
+        log.info("玩家id：{}，跳过", messageRequest.getUnifyId());
+        //出牌
+        MessageResponse<Void> mr = roomHandler.skip(messageRequest);
+        //回送消息
+        messageService.sendMessage(ctx.channel(), mr);
+    }
+
+    public void peng(ChannelHandlerContext ctx, MessageRequest messageRequest) {
+        PengContent content = JSONObject.parseObject(messageRequest.getContent(), PengContent.class);
+        log.info("玩家id：{}，碰牌：{}", messageRequest.getUnifyId(),content.getCard());
+        //出牌
+        MessageResponse<Void> mr = roomHandler.peng(messageRequest, content);
+        //回送消息
+        messageService.sendMessage(ctx.channel(), mr);
+    }
+
+    public void gang(ChannelHandlerContext ctx, MessageRequest messageRequest) {
+        GangContent content = JSONObject.parseObject(messageRequest.getContent(), GangContent.class);
+        log.info("玩家id：{}，杠牌：{}", messageRequest.getUnifyId(), content.getCard());
+        //出牌
+        MessageResponse<Void> mr = roomHandler.gang(messageRequest, content);
+        //回送消息
+        messageService.sendMessage(ctx.channel(), mr);
+    }
+
+    public void win(ChannelHandlerContext ctx, MessageRequest messageRequest) {
+        WinContent content = JSONObject.parseObject(messageRequest.getContent(), WinContent.class);
+        log.info("玩家id：{}，胡牌：{}", messageRequest.getUnifyId(), WinContent.class);
+        //出牌
+        MessageResponse<Void> mr = roomHandler.win(messageRequest, content);
+        //回送消息
+        messageService.sendMessage(ctx.channel(), mr);
+    }
+
+
 }

@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 @Data
 @Accessors(chain = true)
@@ -24,6 +25,8 @@ public class RoomVo {
     private String banker; //庄家
     private GameInfo gameInfo;
     private boolean gameStart = false;
+    private Map<String, List<String>> waitOrderMap;
+    private Map<String, OperationVo> operationMap; //key: operation
 
     public PlayerChannelVo selectPlayer(String unifyId) {
         if (unifyId == null) return null;

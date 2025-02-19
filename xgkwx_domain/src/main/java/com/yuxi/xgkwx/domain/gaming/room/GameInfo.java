@@ -119,4 +119,16 @@ public class GameInfo {
         else if (cards[targetCard] == -1) cards[targetCard] =  -3;
         else throw new CommonException(GameExceptionEnums.INNER_ERROR);
     }
+
+    public void peng(String unifyId, String card) {
+        short[] cards = playerCardsMap.get(unifyId).getPlayerHandCards();
+        short targetCard = Short.parseShort(card);
+        cards[targetCard] = -3;
+    }
+
+    public void gang(String unifyId, String card, String gangType) {
+        short[] cards = playerCardsMap.get(unifyId).getPlayerHandCards();
+        short targetCard = Short.parseShort(card);
+        cards[targetCard] = -4;
+    }
 }
