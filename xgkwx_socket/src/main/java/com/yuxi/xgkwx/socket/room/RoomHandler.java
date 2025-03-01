@@ -249,11 +249,19 @@ public class RoomHandler {
             //加到对应list中
             roomVo.getGameInfo().getPlayerCardsMap().get(messageRequest.getUnifyId()).getPlayerOutsCardList().add(card);
             //获取下一个玩家
-            PlayerChannelVo player = roomVo.getPlayers().get((roomVo.selectPlayerIndex(messageRequest.getUnifyId()) + 1) % 3);
+            PlayerChannelVo playerVo = roomVo.getPlayers().get((roomVo.selectPlayerIndex(messageRequest.getUnifyId()) + 1) % 3);
             //发牌
-            String nextCard = gameInfo.cardIn(player.getUnifyId());
-            messageService.sendCustomMessage(player.getChannel(), GameMsgEnums.PLAYER_IN, player.getUnifyId(),
-                    new CardInContent(nextCard, "30"));
+            String nextCard = gameInfo.cardIn(playerVo.getUnifyId());
+            //进牌消息
+            messageService.sendCustomMessage(playerVo.getChannel(), GameMsgEnums.IN, playerVo.getUnifyId(), new CardInContent(nextCard, "30"));
+            //其他玩家收到【玩家进牌】消息
+            roomVo.getPlayers().forEach(player -> {
+                //除了庄家
+                if (!playerVo.getUnifyId().equals(player.getUnifyId())) {
+                    //向其他玩家广播【玩家进牌】消息
+                    messageService.sendCustomMessage(player.getChannel(), GameMsgEnums.PLAYER_IN, player.getUnifyId(), new OtherPlayerInContent(playerVo.getUnifyId(), "30"));
+                }
+            });
         } else {
             //有碰杠胡，那么按照碰杠胡的消息发送给对应玩家
             roomVo.getPlayers().forEach(player -> {
