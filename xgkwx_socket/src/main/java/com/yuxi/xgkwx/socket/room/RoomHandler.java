@@ -6,6 +6,7 @@ import com.yuxi.xgkwx.common.enums.GameMsgEnums;
 import com.yuxi.xgkwx.common.exception.CommonException;
 import com.yuxi.xgkwx.common.exception.GameExceptionEnums;
 import com.yuxi.xgkwx.common.rule.enums.OperationTypeEnum;
+import com.yuxi.xgkwx.common.utils.CollectionUtil;
 import com.yuxi.xgkwx.common.utils.GameUtils;
 import com.yuxi.xgkwx.common.utils.RuleUtil;
 import com.yuxi.xgkwx.domain.gaming.player.PlayerCardsVo;
@@ -285,10 +286,10 @@ public class RoomHandler {
         waitOrderMap.get(OperationTypeEnum.WIN.getCode()).remove(messageRequest.getUnifyId());
         waitOrderMap.get(OperationTypeEnum.PENG.getCode()).remove(messageRequest.getUnifyId());
 
-        if(waitOrderMap.get(OperationTypeEnum.WIN.getCode()).isEmpty() && waitOrderMap.get(OperationTypeEnum.PENG.getCode()).isEmpty()) {
+        if(CollectionUtil.isEmpty(waitOrderMap.get(OperationTypeEnum.WIN.getCode())) && CollectionUtil.isEmpty(waitOrderMap.get(OperationTypeEnum.PENG.getCode()))) {
             messageService.sendNoteMessageToAllPlayers(roomVo, GameMsgEnums.END_WAIT);
         } else {
-            if(waitOrderMap.get(OperationTypeEnum.WIN.getCode()).isEmpty()) {
+            if(CollectionUtil.isEmpty(waitOrderMap.get(OperationTypeEnum.WIN.getCode()))) {
                 Map<String, OperationVo> operationMap = roomVo.getOperationMap();
                 if(operationMap.containsKey(OperationTypeEnum.PENG.getCode())) {
                     OperationVo operationVo = operationMap.get(OperationTypeEnum.PENG.getCode());
@@ -307,7 +308,7 @@ public class RoomHandler {
         RoomVo roomVo = getRoomVo(messageRequest);
         Map<String, List<String>> waitOrderMap = roomVo.getWaitOrderMap();
         //还有赢牌的等待决策
-        if(!waitOrderMap.get(OperationTypeEnum.WIN.getCode()).isEmpty()) {
+        if(!CollectionUtil.isEmpty(waitOrderMap.get(OperationTypeEnum.WIN.getCode()))) {
             Map<String, OperationVo> operationMap = new HashMap<>();
             operationMap.put(OperationTypeEnum.PENG.getCode(), new OperationVo(messageRequest.getUnifyId(), OperationTypeEnum.PENG.getCode(), content.getCard(), null));
             roomVo.setOperationMap(operationMap);
@@ -325,7 +326,7 @@ public class RoomHandler {
         RoomVo roomVo = getRoomVo(messageRequest);
         Map<String, List<String>> waitOrderMap = roomVo.getWaitOrderMap();
         //还有赢牌的等待决策
-        if(!waitOrderMap.get(OperationTypeEnum.WIN.getCode()).isEmpty()) {
+        if(!CollectionUtil.isEmpty(waitOrderMap.get(OperationTypeEnum.WIN.getCode()))) {
             Map<String, OperationVo> operationMap = new HashMap<>();
             operationMap.put(OperationTypeEnum.GANG.getCode(), new OperationVo(messageRequest.getUnifyId(), OperationTypeEnum.GANG.getCode(), content.getCard(), content.getGangType()));
             roomVo.setOperationMap(operationMap);
