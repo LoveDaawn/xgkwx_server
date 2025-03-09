@@ -25,8 +25,8 @@ public enum GameMsgEnums {
     OUT_PROP("OUT_PROP", "广播出牌"), //后端发给前端
     ACK("ACK", "确认"),
     WAIT_OP("WAIT_OP", "等待决策"), //后端发给前端
-    WAIT("WAIT", "等待读秒"), //后端发给前端
-    SKIP("SKIP", "过"),
+    WAIT("WAIT", "等待读秒"),
+    SKIP("SKIP", "过"), //后端发给前端
     END_WAIT("END_WAIT", "等待结束"),//后端发给前端
     PENG("PENG", "碰"),
     PENG_PROP("PENG_PROP", "确认碰牌"), //后端发给前端

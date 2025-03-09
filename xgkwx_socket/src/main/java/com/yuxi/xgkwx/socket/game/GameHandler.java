@@ -13,10 +13,7 @@ import com.yuxi.xgkwx.socket.msg.req.MessageRequest;
 import com.yuxi.xgkwx.socket.msg.req.content.GangContent;
 import com.yuxi.xgkwx.socket.msg.req.content.PengContent;
 import com.yuxi.xgkwx.socket.msg.req.content.WinContent;
-import com.yuxi.xgkwx.socket.msg.res.content.ConfirmWinContent;
-import com.yuxi.xgkwx.socket.msg.res.content.GangPropContent;
-import com.yuxi.xgkwx.socket.msg.res.content.PengPropContent;
-import com.yuxi.xgkwx.socket.msg.res.content.WaitOpContent;
+import com.yuxi.xgkwx.socket.msg.res.content.*;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 
@@ -54,7 +51,7 @@ public class GameHandler {
                 //杠牌检测
                 if(RuleUtil.gangCheck(cards, Short.parseShort(card), false)) {
                     operationCardVo = operationCardVo == null ? new OperationCardVo(player.getUnifyId(), Short.parseShort(card), OperationTypeEnum.GANG.getCode()) : operationCardVo;
-                    opMap.put(player, new OperationCardVo(player.getUnifyId(), Short.parseShort(card), OperationTypeEnum.GANG.getCode()));
+                    opMap.put(player, operationCardVo);
                 }
                 //碰牌检测
                 if(RuleUtil.pengCheck(cards, Short.parseShort(card))) {
@@ -73,6 +70,12 @@ public class GameHandler {
         waitOpContent.setWIN(action.canWin());
         waitOpContent.setTimeWait("30");
         return waitOpContent;
+    }
+
+    public CardInContent buildCardInContent(String card, short[] cards, boolean cardinFlag) {
+        boolean gang = RuleUtil.gangCheck(cards, Short.parseShort(card), cardinFlag);
+        boolean win = RuleUtil.winCheck(cards, Short.parseShort(card));
+        return new CardInContent(card, gang, win, "30");
     }
 
     public Map<String, List<String>> opMapToOrderMap(Map<PlayerChannelVo, OperationCardVo> opMap) {

@@ -7,5 +7,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class CardInContent {
     private String info;
+    private boolean GANG;
+    private boolean WIN;
     private String timeWait;
 }

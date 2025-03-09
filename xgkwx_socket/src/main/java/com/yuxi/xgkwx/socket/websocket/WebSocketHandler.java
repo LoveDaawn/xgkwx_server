@@ -71,7 +71,7 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<String> {
                 case OUT:
                     roomService.cardOut(ctx, messageRequest);
                     break;
-                case WAIT:
+                case SKIP:
                     roomService.skip(ctx, messageRequest);
                     break;
                 case PENG:

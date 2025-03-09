@@ -201,7 +201,8 @@ public class RoomHandler {
         String roomMaster = roomVo.getRoomMaster();
         String card = gameInfo.cardIn(roomMaster);
         //进牌消息
-        messageService.sendCustomMessage(roomVo.selectPlayer(roomMaster).getChannel(), GameMsgEnums.IN, roomMaster, new CardInContent(card, "30")); //TODO: 配置读取
+        short[] playerHandCards = gameInfo.getPlayerCardsMap().get(roomMaster).getPlayerHandCards();
+        messageService.sendCustomMessage(roomVo.selectPlayer(roomMaster).getChannel(), GameMsgEnums.IN, roomMaster, gameHandler.buildCardInContent(card, playerHandCards, true)); //TODO: 配置读取
         //其他玩家收到【玩家进牌】消息
         roomVo.getPlayers().forEach(player -> {
             //除了庄家
@@ -254,7 +255,8 @@ public class RoomHandler {
             //发牌
             String nextCard = gameInfo.cardIn(playerVo.getUnifyId());
             //进牌消息
-            messageService.sendCustomMessage(playerVo.getChannel(), GameMsgEnums.IN, playerVo.getUnifyId(), new CardInContent(nextCard, "30"));
+            short[] playerHandCards = gameInfo.getPlayerCardsMap().get(messageRequest.getUnifyId()).getPlayerHandCards();
+            messageService.sendCustomMessage(playerVo.getChannel(), GameMsgEnums.IN, playerVo.getUnifyId(), gameHandler.buildCardInContent(nextCard, playerHandCards, true));
             //其他玩家收到【玩家进牌】消息
             roomVo.getPlayers().forEach(player -> {
                 //除了庄家
