@@ -29,10 +29,11 @@ public class GameHandler {
 
     /**
      * 碰杠胡检测
-     * @param messageRequest 消息体
-     * @param roomVo 房间值对象
+     *
+     * @param messageRequest         消息体
+     * @param roomVo                 房间值对象
      * @param targetPlayerCardsVoMap 玩家手牌映射表
-     * @param card 待决策牌
+     * @param card                   待决策牌
      * @return 检测结果
      */
     public Map<PlayerChannelVo, OperationCardVo> pengGangWinCheck(MessageRequest messageRequest, RoomVo roomVo, Map<String, PlayerCardsVo> targetPlayerCardsVoMap, String card) {
@@ -49,12 +50,12 @@ public class GameHandler {
                     opMap.put(player, operationCardVo);
                 }
                 //杠牌检测
-                if(RuleUtil.gangCheck(cards, Short.parseShort(card), false)) {
+                if (RuleUtil.gangCheck(cards, Short.parseShort(card), false)) {
                     operationCardVo = operationCardVo == null ? new OperationCardVo(player.getUnifyId(), Short.parseShort(card), OperationTypeEnum.GANG.getCode()) : operationCardVo;
                     opMap.put(player, operationCardVo);
                 }
                 //碰牌检测
-                if(RuleUtil.pengCheck(cards, Short.parseShort(card))) {
+                if (RuleUtil.pengCheck(cards, Short.parseShort(card))) {
                     opMap.put(player, new OperationCardVo(player.getUnifyId(), Short.parseShort(card), OperationTypeEnum.PENG.getCode()));
                 }
             }
@@ -79,14 +80,14 @@ public class GameHandler {
     }
 
     public Map<String, List<String>> opMapToOrderMap(Map<PlayerChannelVo, OperationCardVo> opMap) {
-        if(opMap == null || opMap.isEmpty()) {
+        if (opMap == null || opMap.isEmpty()) {
             return null;
         }
         Map<String, List<String>> orderMap = new HashMap<>();
         //胡牌者
-        opMap.forEach((k,v) -> {
-            if(v.canWin()) {
-                if(orderMap.get(OperationTypeEnum.WIN.getCode()) == null) {
+        opMap.forEach((k, v) -> {
+            if (v.canWin()) {
+                if (orderMap.get(OperationTypeEnum.WIN.getCode()) == null) {
                     ArrayList<String> winList = new ArrayList<>();
                     winList.add(k.getUnifyId());
                     orderMap.put(OperationTypeEnum.WIN.getCode(), orderMap.getOrDefault(OperationTypeEnum.WIN.getCode(), winList));
@@ -94,7 +95,7 @@ public class GameHandler {
                     orderMap.get(OperationTypeEnum.WIN.getCode()).add(k.getUnifyId());
                 }
             }
-            if(v.canGang() || v.canPeng()) {
+            if (v.canGang() || v.canPeng()) {
                 ArrayList<String> pengGangList = new ArrayList<>();
                 pengGangList.add(k.getUnifyId());
                 orderMap.put(OperationTypeEnum.PENG.getCode(), pengGangList);
@@ -131,5 +132,22 @@ public class GameHandler {
         confirmWinContent.setCard(winContent.getCard());
         confirmWinContent.setMultiple(16);
         return confirmWinContent;
+    }
+
+
+    public void removeWhenExist(Map<String, List<String>> waitOrderMap, String unifyId) {
+        List<String> winList = waitOrderMap.get(OperationTypeEnum.WIN.getCode());
+        if (winList != null && !winList.isEmpty()) {
+            winList.remove(unifyId);
+        }
+        List<String> pengList = waitOrderMap.get(OperationTypeEnum.PENG.getCode());
+        if (pengList != null && !pengList.isEmpty()) {
+            pengList.remove(unifyId);
+        }
+        List<String> gangList = waitOrderMap.get(OperationTypeEnum.GANG.getCode());
+        if (gangList != null && !gangList.isEmpty()) {
+            gangList.remove(unifyId);
+        }
+
     }
 }

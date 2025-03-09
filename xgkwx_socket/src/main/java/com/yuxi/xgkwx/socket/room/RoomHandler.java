@@ -285,8 +285,7 @@ public class RoomHandler {
     public MessageResponse<Void> skip(MessageRequest messageRequest) {
         RoomVo roomVo = getRoomVo(messageRequest);
         Map<String, List<String>> waitOrderMap = roomVo.getWaitOrderMap();
-        waitOrderMap.get(OperationTypeEnum.WIN.getCode()).remove(messageRequest.getUnifyId());
-        waitOrderMap.get(OperationTypeEnum.PENG.getCode()).remove(messageRequest.getUnifyId());
+        gameHandler.removeWhenExist(waitOrderMap, messageRequest.getUnifyId());
 
         if(CollectionUtil.isEmpty(waitOrderMap.get(OperationTypeEnum.WIN.getCode())) && CollectionUtil.isEmpty(waitOrderMap.get(OperationTypeEnum.PENG.getCode()))) {
             messageService.sendNoteMessageToAllPlayers(roomVo, GameMsgEnums.END_WAIT);
