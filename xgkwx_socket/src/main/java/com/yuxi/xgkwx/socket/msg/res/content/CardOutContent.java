@@ -11,5 +11,4 @@ public class CardOutContent {
     private String card;
     private String unifyId;
     private String round;
-    private List<String> opList;
 }

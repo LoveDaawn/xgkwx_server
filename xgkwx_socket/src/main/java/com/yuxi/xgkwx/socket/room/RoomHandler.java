@@ -227,13 +227,7 @@ public class RoomHandler {
         Map<PlayerChannelVo, OperationCardVo> opMap = gameHandler.pengGangWinCheck(messageRequest, roomVo, targetPlayerCardsVoMap, card);
 
         //广播出牌消息
-        roomVo.getPlayers().forEach(player -> {
-            //除了发牌者
-            if (!player.getUnifyId().equals(messageRequest.getUnifyId())) {
-                messageService.sendCustomMessage(player.getChannel(), GameMsgEnums.OUT_PROP, player.getUnifyId(),
-                        new CardOutContent(card, messageRequest.getUnifyId(), content.getRound(), null));
-            }
-        });
+        messageService.sendCustomMessageToAllPlayers(roomVo, GameMsgEnums.OUT_PROP, new CardOutContent(card, messageRequest.getUnifyId(), content.getRound()));
 
         //出牌者听牌判断
         List<Short> listenedCards = RuleUtil.listenCheck(targetPlayerCards);
