@@ -288,11 +288,11 @@ public class RoomHandler {
                 Map<String, OperationVo> operationMap = roomVo.getOperationMap();
                 if(operationMap.containsKey(OperationTypeEnum.PENG.getCode())) {
                     OperationVo operationVo = operationMap.get(OperationTypeEnum.PENG.getCode());
-                    gameHandler.pengCard(operationVo.getUnifyId(), new PengContent(operationVo.getCard()), roomVo);
+                    gameHandler.pengCard(operationVo.getUnifyId(), new PengContent(operationVo.getCard(), operationVo.getCardOutUnifyId()), roomVo);
                 }
                 if(operationMap.containsKey(OperationTypeEnum.GANG.getCode())) {
                     OperationVo operationVo = operationMap.get(OperationTypeEnum.GANG.getCode());
-                    gameHandler.gangCard(messageRequest.getUnifyId(), new GangContent(operationVo.getCard(),operationVo.getGangType() ), roomVo);
+                    gameHandler.gangCard(messageRequest.getUnifyId(), new GangContent(operationVo.getCard(),operationVo.getCardOutUnifyId(),operationVo.getGangType()), roomVo);
                 }
             }
         }
@@ -305,7 +305,7 @@ public class RoomHandler {
         //还有赢牌的等待决策
         if(!CollectionUtil.isEmpty(waitOrderMap.get(OperationTypeEnum.WIN.getCode()))) {
             Map<String, OperationVo> operationMap = new HashMap<>();
-            operationMap.put(OperationTypeEnum.PENG.getCode(), new OperationVo(messageRequest.getUnifyId(), OperationTypeEnum.PENG.getCode(), content.getCard(), null));
+            operationMap.put(OperationTypeEnum.PENG.getCode(), new OperationVo(messageRequest.getUnifyId(), OperationTypeEnum.PENG.getCode(), content.getCard(), content.getCardOutUnifyId(), null));
             roomVo.setOperationMap(operationMap);
             return MessageResponseUtils.responseSuccess(messageRequest.getMessageId());
         }
@@ -323,7 +323,7 @@ public class RoomHandler {
         //还有赢牌的等待决策
         if(!CollectionUtil.isEmpty(waitOrderMap.get(OperationTypeEnum.WIN.getCode()))) {
             Map<String, OperationVo> operationMap = new HashMap<>();
-            operationMap.put(OperationTypeEnum.GANG.getCode(), new OperationVo(messageRequest.getUnifyId(), OperationTypeEnum.GANG.getCode(), content.getCard(), content.getGangType()));
+            operationMap.put(OperationTypeEnum.GANG.getCode(), new OperationVo(messageRequest.getUnifyId(), OperationTypeEnum.GANG.getCode(), content.getCard(), content.getCardOutUnifyId(), content.getGangType()));
             roomVo.setOperationMap(operationMap);
             return MessageResponseUtils.responseSuccess(messageRequest.getMessageId());
         }

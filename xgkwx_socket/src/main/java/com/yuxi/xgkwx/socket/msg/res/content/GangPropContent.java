@@ -8,5 +8,6 @@ import lombok.Data;
 public class GangPropContent {
     private String unifyId;
     private String card;
+    private String cardOutUnifyId;
     private String gangType;
 }

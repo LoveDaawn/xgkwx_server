@@ -9,5 +9,6 @@ public class OperationVo {
     private String unifyId;
     private String operation;
     private String card;
+    private String cardOutUnifyId;
     private String gangType;
 }

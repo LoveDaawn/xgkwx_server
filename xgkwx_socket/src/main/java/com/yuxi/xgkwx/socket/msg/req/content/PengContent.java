@@ -7,4 +7,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class PengContent {
     private String card;
+    private String cardOutUnifyId; //打牌者id
 }

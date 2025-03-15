@@ -111,7 +111,7 @@ public class GameHandler {
         gameInfo.peng(unifyId, content.getCard());
 
         //发送消息
-        messageService.sendCustomMessageToAllPlayers(roomVo, GameMsgEnums.PENG_PROP, new PengPropContent(unifyId, content.getCard()));
+        messageService.sendCustomMessageToAllPlayers(roomVo, GameMsgEnums.PENG_PROP, new PengPropContent(unifyId, content.getCard(), content.getCardOutUnifyId()));
     }
 
     public void gangCard(String unifyId, GangContent content, RoomVo roomVo) {
@@ -119,7 +119,7 @@ public class GameHandler {
         GameInfo gameInfo = roomVo.getGameInfo();
         gameInfo.gang(unifyId, content.getCard(), content.getGangType());
         //发送消息
-        messageService.sendCustomMessageToAllPlayers(roomVo, GameMsgEnums.GANG_PROP, new GangPropContent(unifyId, content.getCard(), content.getGangType()));
+        messageService.sendCustomMessageToAllPlayers(roomVo, GameMsgEnums.GANG_PROP, new GangPropContent(unifyId, content.getCard(), content.getCardOutUnifyId(), content.getGangType()));
     }
 
     public ConfirmWinContent win(String unifyId, WinContent winContent, RoomVo roomVo, GameInfo gameInfo) {

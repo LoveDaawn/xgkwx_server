@@ -8,4 +8,5 @@ import lombok.Data;
 public class PengPropContent {
     private String unifyId;
     private String card;
+    private String cardOutUnifyId;
 }

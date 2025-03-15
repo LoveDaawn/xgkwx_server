@@ -7,5 +7,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class GangContent {
     private String card;
+    private String cardOutUnifyId;
     private String gangType;
 }
