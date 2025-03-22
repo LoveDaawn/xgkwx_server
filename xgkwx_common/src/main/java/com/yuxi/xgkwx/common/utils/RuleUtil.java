@@ -183,10 +183,19 @@ public class RuleUtil {
     }
 
     public static boolean pengCheck(short[] cards, short card) {
-        return cards[card] == 2;
+        return cards[card] >= 2;
     }
 
-    public static boolean gangCheck(short[] cards, short card, boolean cardInFlag) {
+    public static boolean gangCheckForSelf(short[] cards, short card) {
+        if(cards[card] == 3 || cards[card] == -1)
+            return true;
+        for(int i = 11; i < 36; i++)
+            if(cards[i] == 4)
+                return true;
+        return false;
+    }
+
+    public static boolean gangCheckForElse(short[] cards, short card, boolean cardInFlag) {
         if (cardInFlag)
             return cards[card] == 3 || cards[card] == -1;
         else

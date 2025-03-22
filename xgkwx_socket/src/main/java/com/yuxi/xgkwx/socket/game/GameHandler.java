@@ -50,7 +50,7 @@ public class GameHandler {
                     opMap.put(player, operationCardVo);
                 }
                 //杠牌检测
-                if (RuleUtil.gangCheck(cards, Short.parseShort(card), false)) {
+                if (RuleUtil.gangCheckForElse(cards, Short.parseShort(card), false)) {
                     operationCardVo = operationCardVo == null ? new OperationCardVo(player.getUnifyId(), Short.parseShort(card), OperationTypeEnum.GANG.getCode()) : operationCardVo;
                     opMap.put(player, operationCardVo);
                 }
@@ -74,7 +74,7 @@ public class GameHandler {
     }
 
     public CardInContent buildCardInContent(String card, short[] cards, boolean cardinFlag) {
-        boolean gang = RuleUtil.gangCheck(cards, Short.parseShort(card), cardinFlag);
+        boolean gang = RuleUtil.gangCheckForSelf(cards, Short.parseShort(card));
         boolean win = RuleUtil.winCheck(cards, Short.parseShort(card));
         return new CardInContent(card, gang, win, "30");
     }
